@@ -31,7 +31,8 @@ HW2/
 └── README.md                           # 專案與執行說明
 ```
 
-`data/` 內含大量影像，使用者需自行下載 Kaggle 資料集，並由 `src/data_split.py` 重新產生切分。
+`data/` 內含大量影像，使用者需自行下載 Kaggle 資料集(或執行 `src/download_pneumonia.py` 進行下載)，並由 `src/data_split.py` 重新產生切分 (輸出路徑可以自行設定)。
+
 
 ## 建立 Conda 執行環境
 
