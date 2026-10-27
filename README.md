@@ -9,17 +9,6 @@
 
 ```text
 HW2/
-├── data/
-│   └── chest_xray/
-│       ├── original/                   # Kaggle 官方 train、val、test
-│       │   ├── train/
-│       │   ├── val/
-│       │   └── test/
-│       └── strategy_split/             # 本作業固定使用的新切分
-│           ├── train/                  # EDA 使用兩類；one-class fitting 只用 NORMAL
-│           ├── val/                    # 選擇 hyperparameters 與 threshold τ
-│           ├── test/                   # 完整保留的官方 frozen test
-│           └── manifest.csv            # 每張影像的來源、標籤與 split
 ├── doc/                                # 作業各章節的分析與說明
 │   ├── DataSplit_LeakagePrevention.md
 │   ├── TaskDefinition_Labels_ClassImbalance.md
@@ -38,7 +27,7 @@ HW2/
 │   ├── data_split.py
 │   ├── data_statistics.py
 │   └── eda.py
-├── requirment.txt                      # 所需套件
+├── requirements.txt                      # 所需套件
 └── README.md                           # 專案與執行說明
 ```
 
@@ -47,10 +36,9 @@ HW2/
 ## 建立 Conda 執行環境
 
 ```bash
-cd Data-Mining-Hw2
 conda create --name dm_hw2 python=3.11 pip -y
 conda activate dm_hw2
-python -m pip install -r requirment.txt
+python -m pip install -r requirements.txt
 ```
 
 ## 主要程式
