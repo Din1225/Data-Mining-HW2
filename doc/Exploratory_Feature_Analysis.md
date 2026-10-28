@@ -2,7 +2,7 @@
 
 ## 1. Distribution Contrast
 
-本分析嚴格只使用 `strategy_split/train` 的 4,708 張影像，包括 1,214 張 `NORMAL` 與 3,494 張 `PNEUMONIA`；validation 與 test 完全未讀取。影像轉為灰階並縮放至 256×256 後，提取平均亮度、亮度標準差、entropy 與相鄰像素的平均 edge strength；aspect ratio 則使用原始寬高計算。下圖使用 density-normalized histograms，避免兩類樣本數不同直接影響柱高。
+本分析嚴格只使用 `re_split/train` 的 4,708 張影像，包括 1,214 張 `NORMAL` 與 3,494 張 `PNEUMONIA`；validation 與 test 完全未讀取。影像轉為灰階並縮放至 256×256 後，提取平均亮度、亮度標準差、entropy 與相鄰像素的平均 edge strength；aspect ratio 則使用原始寬高計算。下圖使用 density-normalized histograms，避免兩類樣本數不同直接影響柱高。
 
 ![Training-only feature distributions](../results/eda/feature_distributions.png)
 
@@ -39,7 +39,7 @@ Edge strength 的分離度最高，其次為 aspect ratio；intensity std 與 en
 
 ## 3. Exploratory Hypotheses
 
-- **H1 — Texture hypothesis：** PNEUMONIA 的 edge strength、contrast 與 entropy 較低，因此包含局部紋理或多尺度邊緣資訊的表示，應比只使用平均亮度更能分離異常。
+- **H1 — Texture hypothesis：** PNEUMONIA 的 edge strength、intensity std 與 entropy 較低，因此包含局部紋理或多尺度邊緣資訊的表示，應比只使用平均亮度更能分離異常。
 - **H2 — Contrast-normalization hypothesis：** 兩類的 intensity std 與 entropy 有中等差異。將比較原始灰階 normalization 與 contrast normalization；若 normalization 後仍能維持或提升 test 表現，表示模型學到的訊號不只是曝光或對比差異。
 
 以上假設都由 training-only 結果提出；validation 只用於選擇 hyperparameters 與 threshold $\tau$，test 保持 unseen，直到最終評估。

@@ -2,7 +2,7 @@
 
 ## 1. 資料來源
 
-本研究使用 Paul Mooney 整理的 [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)，共 5,856 張胸部 X-ray，包括 1,583 張 `NORMAL` 與 4,273 張 `PNEUMONIA`。原始資料保留在 `data/chest_xray/original`，新的切分放在 `data/chest_xray/strategy_split`。
+本研究使用 Paul Mooney 整理的 [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)，共 5,856 張胸部 X-ray，包括 1,583 張 `NORMAL` 與 4,273 張 `PNEUMONIA`。原始資料保留在 `data/chest_xray/original`，新的切分放在 `data/chest_xray/re_split`。
 
 ## 2. 為什麼重新切分
 
@@ -24,6 +24,6 @@
 - One-class 模型只使用 `train/NORMAL` fitting。
 - Validation 只用於選擇 hyperparameters 與 threshold $\tau$，不更新最終模型權重。
 - Test 在所有設計確定後只評估一次，且三個 tiers 使用相同 test。
-- 所有影像的來源與新位置記錄在 `strategy_split/manifest.csv`。
+- 所有影像的來源與新位置記錄在 `re_split/manifest.csv`。
 
 此外，官方 test 的 `PNEUMONIA` 比例為 62.5%，只是資料比例，不代表一般臨床場域的肺炎盛行率。

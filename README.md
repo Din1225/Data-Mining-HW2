@@ -31,8 +31,6 @@ HW2/
 └── README.md                           # 專案與執行說明
 ```
 
-`data/` 內含大量影像，使用者需自行下載 Kaggle 資料集(或執行 `src/download_pneumonia.py` 進行下載)，並由 `src/data_split.py` 重新產生切分 (輸出路徑可以自行設定)。
-
 
 ## 建立 Conda 執行環境
 
@@ -42,13 +40,19 @@ conda activate dm_hw2
 python -m pip install -r requirements.txt
 ```
 
+
+## 下載資料集與資料切分
+
+由於資料內含大量影像，並沒上傳至此 repo，需自行執行 `src/download_pneumonia.py` 進行資料集下載，並由 `src/data_split.py` 重新產生切分。
+
+
 ## 主要程式
 
 | 程式 | 用途 |
 |---|---|
 | `src/download_pneumonia.py` | 使用 `kagglehub` 下載 Chest X-Ray Pneumonia 資料集，並顯示下載位置 |
 | `src/data_split.py` | 合併官方 train/val，以 seed 42 進行 stratified、group-aware 的 90/10 train/validation 切分，並完整保留官方 test |
-| `src/data_statistics.py` | 讀取固定 manifest，輸出資料數量、影像尺寸、類別比例與 always-majority baseline；不建立文件 |
+| `src/data_statistics.py` | 讀取固定 manifest，輸出資料數量、影像尺寸、類別比例與；不建立文件 |
 | `src/eda.py` | 只使用新 train 的 NORMAL/PNEUMONIA 提取影像特徵，計算 KS、Wasserstein、MI、point-biserial correlation 與 Spearman correlation，並輸出 CSV 與圖表 |
 
 

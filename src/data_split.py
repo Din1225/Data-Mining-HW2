@@ -2,10 +2,10 @@
 程式用途：合併官方 train/val 後重新做分層切分，並完整保留官方 test。
 
 主要執行流程：
-1. 讀取 original/train 與 original/val，形成 development pool。
+1. 讀取 chest_xray/original/train 與 original/val，形成 development pool。
 2. 使用固定 seed，依標籤及檔名推定群組切出 10% validation。
 3. 將其餘 development data 設為新 train，官方 test 原樣設為新 test。
-4. 複製影像到 strategy_split，並建立所有方法共用的 manifest.csv。
+4. 複製影像到 re-split，並建立所有方法共用的 manifest.csv。
 
 本程式只負責資料切分，不會建立或修改 Markdown 文件。
 """
@@ -176,7 +176,7 @@ def write_manifest(
             )
 
 
-# 先建立完整 staging，成功後才取代既有 strategy_split。
+# 先建立完整 staging，成功後才取代既有 re-split。
 def materialize_split(
     assignments: list[Assignment],
     source_dir: Path,
@@ -227,7 +227,7 @@ def parse_args(project_dir: Path) -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=project_dir / "data" / "chest_xray" / "strategy_split",
+        default=project_dir / "data" / "chest_xray" / "re-split",
     )
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument(
@@ -238,13 +238,13 @@ def parse_args(project_dir: Path) -> argparse.Namespace:
     parser.add_argument(
         "--replace",
         action="store_true",
-        help="完整建立新 staging 後，取代既有 strategy_split",
+        help="完整建立新 staging 後，取代既有 re-split",
     )
     return parser.parse_args()
 
 
 def main() -> None:
-    project_dir = Path(__file__).resolve().parent
+    project_dir = Path(__file__).resolve().parent.parent
     args = parse_args(project_dir)
     if not 0.0 < args.validation_fraction < 1.0:
         raise ValueError("validation-fraction 必須介於 0 與 1 之間")

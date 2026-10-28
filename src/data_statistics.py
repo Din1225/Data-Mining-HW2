@@ -2,7 +2,7 @@
 程式用途：讀取既有資料切分，統計樣本數、類別比例與訓練影像規格。
 
 主要執行流程：
-1. 讀取 strategy_split/manifest.csv，統計來源資料與各 partition 的數量。
+1. 讀取 re-split/manifest.csv，統計來源資料與各 partition 的數量。
 2. 只解析 train/NORMAL 的影像標頭，計算寬、高與通道摘要。
 3. 計算 frozen test 的類別比例與 always-normal baseline。
 4. 將統計結果輸出到終端，不建立或修改文件。
@@ -132,7 +132,7 @@ def calculate_statistics(dataset_root: Path, rows: list[ManifestRow]) -> dict:
         if row.new_split == "train" and row.label == "NORMAL"
     ]
     train_shapes = [
-        read_image_shape(dataset_root / "strategy_split" / row.new_path)
+        read_image_shape(dataset_root / "re-split" / row.new_path)
         for row in train_rows
     ]
     widths = [shape[0] for shape in train_shapes]
@@ -214,10 +214,10 @@ def parse_args(project_dir: Path) -> argparse.Namespace:
 
 # 主流程只讀取資料並輸出統計，不會寫入任何檔案。
 def main() -> None:
-    project_dir = Path(__file__).resolve().parent
+    project_dir = Path(__file__).resolve().parent.parent
     args = parse_args(project_dir)
     dataset_root = args.dataset_root.resolve()
-    rows = read_manifest(dataset_root / "strategy_split" / "manifest.csv")
+    rows = read_manifest(dataset_root / "re-split" / "manifest.csv")
     stats = calculate_statistics(dataset_root, rows)
     print_statistics(stats)
 

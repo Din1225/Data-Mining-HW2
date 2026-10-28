@@ -1,5 +1,5 @@
 """
-程式用途：只使用 strategy_split 的 training portion，比較正常與肺炎影像的特徵分布。
+程式用途：只使用 re-split 的 training portion，比較正常與肺炎影像的特徵分布。
 
 主要執行流程：
 1. 從 manifest.csv 僅選取 new_split=train 的 NORMAL 與 PNEUMONIA。
@@ -348,7 +348,7 @@ def parse_args(project_dir: Path) -> argparse.Namespace:
     parser.add_argument(
         "--split-dir",
         type=Path,
-        default=project_dir / "data" / "chest_xray" / "strategy_split",
+        default=project_dir / "data" / "chest_xray" / "re-split",
     )
     parser.add_argument(
         "--output-dir",
@@ -361,7 +361,7 @@ def parse_args(project_dir: Path) -> argparse.Namespace:
 
 # 主流程只產生分析資料與圖表；研究文字由實際結果確認後另外撰寫。
 def main() -> None:
-    project_dir = Path(__file__).resolve().parent
+    project_dir = Path(__file__).resolve().parent.parent
     args = parse_args(project_dir)
     split_dir = args.split_dir.resolve()
     output_dir = args.output_dir.resolve()
