@@ -20,6 +20,7 @@ HW2/
 │   │       ├── scores_seed<k>.csv      # path, split, label, score
 │   │       └── method.json             # 方法參數、fixed τ、訓練時間與推論延遲
 │   ├── evaluation/                     # 共用評估輸出：summary、per-seed、paired bootstrap
+│   ├── tier2/                          # Tier 2 只用 val 的設定選擇（layer、normalize、k）
 │   ├── leakage/                        # 切分間的群組重疊與重複影像檢查
 │   │   ├── group_overlap.csv
 │   │   ├── personn_numbering.csv
@@ -39,6 +40,8 @@ HW2/
 │   ├── check_leakage.py
 │   ├── eda.py
 │   ├── tier1_baselines.py
+│   ├── tier2_feature_knn.py
+│   ├── tier3_densenet.py
 │   └── evaluation.py
 ├── requirements.txt                      # 所需套件
 └── README.md                           # 專案與執行說明
@@ -69,6 +72,8 @@ python -m pip install -r requirements.txt
 | `src/check_leakage.py` | 讀取固定 manifest，以「檔名群組」與「檔名群組＋肺炎類型」檢查 train/val/test 的群組重疊，檢驗 personN 是否依 bacteria/virus 各自編號，並以 SHA-256 找出重複影像；發現跨 split 洩漏時以狀態 1 結束 |
 | `src/eda.py` | 只使用新 train 的 NORMAL/PNEUMONIA 提取影像特徵，計算 KS、Wasserstein、MI、point-biserial correlation 與 Spearman correlation，並輸出 CSV 與圖表 |
 | `src/tier1_baselines.py` | 建立 Tier 1 baselines：constant、random（3 seeds）、edge strength 3σ rule，以及寬高比 shortcut probe；μ、σ 只用 train/NORMAL 估計 |
+| `src/tier2_feature_knn.py` | Tier 2 primary method：凍結的 ImageNet DenseNet121 特徵上做 one-class kNN（memory bank 只含 train/NORMAL）。子指令 `extract`（GPU 提取特徵）、`select`（只用 val ROC-AUC 選 layer/normalize/k）、`score`（輸出分數；支援 Mahalanobis、contamination 與 bank-fraction ablation） |
+| `src/tier3_densenet.py` | Tier 3 strong reference：監督式 DenseNet121 fine-tuning；recipe 改寫自 [yenkuliu/pneumonia-classification](https://github.com/yenkuliu/pneumonia-classification)（MIT），改用本專案 manifest，score 為 logit 差 |
 | `src/evaluation.py` | 所有 tiers 共用的評估：驗證分數檔與 manifest 一致，計算 ROC-AUC、PR-AUC、Sens@Spec95、Spec@Sens95；只用 val 選 τ（normal_percentile、best_f1、sensitivity_target、fixed），並以 stratified／paired bootstrap 估計 95% CI 與 p 值 |
 
 
@@ -77,8 +82,21 @@ python -m pip install -r requirements.txt
 每個方法把 val/test 的 anomaly score（越高越異常）寫到 `results/methods/<method>/scores_seed<k>.csv`，判定規則為 $s(x) > \tau$。所有方法都以同一個 `evaluation.py` 評估：
 
 ```bash
+# Tier 1
 python src/tier1_baselines.py
-python src/evaluation.py --reference tier1_edge_3sigma
+
+# Tier 2（extract 需要 GPU）
+CUDA_VISIBLE_DEVICES=<free_gpu> python src/tier2_feature_knn.py extract
+python src/tier2_feature_knn.py select
+python src/tier2_feature_knn.py score --method-name tier2_knn --scorer knn
+python src/tier2_feature_knn.py score --method-name tier2_mahalanobis --scorer mahalanobis
+python src/tier2_feature_knn.py score --method-name tier2_knn_contam05 --contamination 0.05 --seeds 0 1 2
+
+# Tier 3（需要 GPU，每個 seed 約 5–15 分鐘）
+for s in 0 1 2; do CUDA_VISIBLE_DEVICES=<free_gpu> python src/tier3_densenet.py --seed $s; done
+
+# 所有方法共用的評估
+python src/evaluation.py --reference tier2_knn
 ```
 
 - $\tau$ 只由 val 決定：`normal_percentile` 取 val NORMAL 分數的第 95 百分位（目標 FPR 5%），`best_f1` 取 val F1 最高者，`sensitivity_target` 取 val sensitivity ≥ 95% 的最大 $\tau$；`method.json` 若有 `fixed_threshold` 則另加 `fixed`。

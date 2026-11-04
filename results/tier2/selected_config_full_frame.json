@@ -1,0 +1,20 @@
+{
+  "knn": {
+    "scorer": "knn",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": 2,
+    "val_roc_auc": 0.963857945348948,
+    "val_pr_auc": 0.984324856895341
+  },
+  "mahalanobis": {
+    "scorer": "mahalanobis",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": 0,
+    "val_roc_auc": 0.9574026468628011,
+    "val_pr_auc": 0.9803193056827565
+  },
+  "criterion": "max val ROC-AUC; test not used",
+  "preprocessing": "full_frame"
+}

@@ -3,9 +3,16 @@
     "tier1_aspect_ratio_probe",
     "tier1_constant",
     "tier1_edge_3sigma",
-    "tier1_random"
+    "tier1_random",
+    "tier2_knn",
+    "tier2_knn_bank90",
+    "tier2_knn_contam01",
+    "tier2_knn_contam05",
+    "tier2_knn_contam10",
+    "tier2_mahalanobis",
+    "tier3_densenet121"
   ],
-  "reference": "tier1_edge_3sigma",
+  "reference": "tier2_knn",
   "bootstrap": 2000,
   "bootstrap_seed": 0,
   "normal_quantile": 0.95,
