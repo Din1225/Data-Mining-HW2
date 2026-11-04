@@ -1,0 +1,13 @@
+{
+  "name": "tier1_edge_3sigma",
+  "tier": 1,
+  "description": "3-sigma rule on mean edge strength; mu/sigma fitted on train/NORMAL only",
+  "feature": "edge_strength",
+  "score": "abs(x - mu) / sigma",
+  "normal_mean": 0.016847723364658174,
+  "normal_std": 0.0019876975558549784,
+  "fit_images": 1214,
+  "fixed_threshold": 3.0,
+  "train_seconds": 0.0006712919566780329,
+  "inference_ms_per_image": 8.016581394785348
+}

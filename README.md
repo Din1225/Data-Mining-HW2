@@ -14,6 +14,12 @@ HW2/
 │   ├── TaskDefinition_Labels_ClassImbalance.md
 │   └── Exploratory_Feature_Analysis.md
 ├── results/
+│   ├── features/                       # 所有 split 的影像特徵快取（Tier 1 使用）
+│   ├── methods/                        # 各方法的 val/test 分數檔，一個方法一個資料夾
+│   │   └── <method>/
+│   │       ├── scores_seed<k>.csv      # path, split, label, score
+│   │       └── method.json             # 方法參數、fixed τ、訓練時間與推論延遲
+│   ├── evaluation/                     # 共用評估輸出：summary、per-seed、paired bootstrap
 │   ├── leakage/                        # 切分間的群組重疊與重複影像檢查
 │   │   ├── group_overlap.csv
 │   │   ├── personn_numbering.csv
@@ -31,7 +37,9 @@ HW2/
 │   ├── data_split.py
 │   ├── data_statistics.py
 │   ├── check_leakage.py
-│   └── eda.py
+│   ├── eda.py
+│   ├── tier1_baselines.py
+│   └── evaluation.py
 ├── requirements.txt                      # 所需套件
 └── README.md                           # 專案與執行說明
 ```
@@ -60,6 +68,21 @@ python -m pip install -r requirements.txt
 | `src/data_statistics.py` | 讀取固定 manifest，輸出資料數量、影像尺寸、類別比例與；不建立文件 |
 | `src/check_leakage.py` | 讀取固定 manifest，以「檔名群組」與「檔名群組＋肺炎類型」檢查 train/val/test 的群組重疊，檢驗 personN 是否依 bacteria/virus 各自編號，並以 SHA-256 找出重複影像；發現跨 split 洩漏時以狀態 1 結束 |
 | `src/eda.py` | 只使用新 train 的 NORMAL/PNEUMONIA 提取影像特徵，計算 KS、Wasserstein、MI、point-biserial correlation 與 Spearman correlation，並輸出 CSV 與圖表 |
+| `src/tier1_baselines.py` | 建立 Tier 1 baselines：constant、random（3 seeds）、edge strength 3σ rule，以及寬高比 shortcut probe；μ、σ 只用 train/NORMAL 估計 |
+| `src/evaluation.py` | 所有 tiers 共用的評估：驗證分數檔與 manifest 一致，計算 ROC-AUC、PR-AUC、Sens@Spec95、Spec@Sens95；只用 val 選 τ（normal_percentile、best_f1、sensitivity_target、fixed），並以 stratified／paired bootstrap 估計 95% CI 與 p 值 |
+
+
+## 評估流程
+
+每個方法把 val/test 的 anomaly score（越高越異常）寫到 `results/methods/<method>/scores_seed<k>.csv`，判定規則為 $s(x) > \tau$。所有方法都以同一個 `evaluation.py` 評估：
+
+```bash
+python src/tier1_baselines.py
+python src/evaluation.py --reference tier1_edge_3sigma
+```
+
+- $\tau$ 只由 val 決定：`normal_percentile` 取 val NORMAL 分數的第 95 百分位（目標 FPR 5%），`best_f1` 取 val F1 最高者，`sensitivity_target` 取 val sensitivity ≥ 95% 的最大 $\tau$；`method.json` 若有 `fixed_threshold` 則另加 `fixed`。
+- Test 只用於最終指標。PPV 與每千張警示數依 `--deployment-prevalence`（預設 5%）由 test 的 sensitivity/specificity 換算。
 
 
 ## 文件

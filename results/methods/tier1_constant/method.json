@@ -1,0 +1,8 @@
+{
+  "name": "tier1_constant",
+  "tier": 1,
+  "description": "Constant score; fixed tau gives always-normal",
+  "fixed_threshold": 0.0,
+  "train_seconds": 0.0,
+  "inference_ms_per_image": 0.0
+}

@@ -1,0 +1,13 @@
+{
+  "name": "tier1_aspect_ratio_probe",
+  "tier": 1,
+  "description": "Shortcut probe: 3-sigma rule on original width/height; not a clinical feature",
+  "feature": "aspect_ratio",
+  "score": "abs(x - mu) / sigma",
+  "normal_mean": 1.2262054972537022,
+  "normal_std": 0.13002564022352658,
+  "fit_images": 1214,
+  "fixed_threshold": 3.0,
+  "train_seconds": 0.0005496430676430464,
+  "inference_ms_per_image": 8.016581394785348
+}

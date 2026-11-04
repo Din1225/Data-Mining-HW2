@@ -1,0 +1,15 @@
+{
+  "methods": [
+    "tier1_aspect_ratio_probe",
+    "tier1_constant",
+    "tier1_edge_3sigma",
+    "tier1_random"
+  ],
+  "reference": "tier1_edge_3sigma",
+  "bootstrap": 2000,
+  "bootstrap_seed": 0,
+  "normal_quantile": 0.95,
+  "target_sensitivity": 0.95,
+  "deployment_prevalence": 0.05,
+  "decision_rule": "alert if s(x) > tau"
+}
