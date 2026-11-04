@@ -9,6 +9,7 @@
     "tier2_knn_contam01",
     "tier2_knn_contam05",
     "tier2_knn_contam10",
+    "tier2_knn_crop",
     "tier2_mahalanobis",
     "tier3_densenet121"
   ],

@@ -1,0 +1,13 @@
+{
+  "method": "tier2_knn",
+  "seed": 0,
+  "strategy": "sensitivity_target",
+  "tau": 0.11775001744652441,
+  "val_normal_score_std": 0.012816890938964997,
+  "test_counts": {
+    "TP": 379,
+    "FP": 141,
+    "TN": 93,
+    "FN": 11
+  }
+}
