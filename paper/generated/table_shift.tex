@@ -1,0 +1,22 @@
+% 由 src/export_latex.py 自動產生；請勿手動修改。
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{NORMAL} & \multicolumn{3}{c}{PNEUMONIA} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Feature & Train & Test & KS & Train & Test & KS \\
+\midrule
+Aspect ratio & 1.22 & 1.35 & .340$^\ast$ & 1.49 & 1.51 & .052 \\
+Edge strength & 0.0169 & 0.0156 & .248$^\ast$ & 0.0121 & 0.0124 & .069 \\
+Width (px) & 1642 & 1762 & .207$^\ast$ & 1160 & 1111 & .136$^\ast$ \\
+Mean intensity & 0.480 & 0.487 & .126 & 0.482 & 0.469 & .102 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Acquisition shift between the training pool and the official test set (medians; two-sample KS statistic, $^\ast$: $p<0.001$). The shift is concentrated in NORMAL images, which move toward PNEUMONIA-like aspect ratio and edge strength. Computed after the single test evaluation, for error analysis only.}
+\label{tab:shift}
+\end{table}

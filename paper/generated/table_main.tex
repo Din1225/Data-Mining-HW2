@@ -1,0 +1,25 @@
+% 由 src/export_latex.py 自動產生；請勿手動修改。
+\begin{table*}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{clcccccccc}
+\toprule
+ & & \multicolumn{3}{c}{Threshold-free} & \multicolumn{3}{c}{At $\tau$ (Sens.\,$\geq$\,95\% on val)} & \multicolumn{2}{c}{Cost} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}\cmidrule(lr){9-10}
+Tier & Method & ROC-AUC {\scriptsize[95\% CI]} & PR-AUC & Sens@Spec95 & Sens. & Spec. & F1 & ms/img & Train \\
+\midrule
+1 & Random score (3 seeds) & 0.491{\scriptsize$\pm$.013} {\scriptsize[.465, .519]} & 0.615{\scriptsize$\pm$.009} & 0.034{\scriptsize$\pm$.012} & 0.950{\scriptsize$\pm$.017} & 0.054{\scriptsize$\pm$.016} & 0.755{\scriptsize$\pm$.007} & 0.0 & $<$1\,s \\
+1 & Aspect-ratio probe & 0.673 {\scriptsize[.630, .716]} & 0.766 & 0.185 & 0.956 & 0.094 & 0.765 & 8.0 & $<$1\,s \\
+1 & Edge strength $3\sigma$ & 0.813 {\scriptsize[.778, .845]} & 0.886 & 0.490 & 0.951 & 0.226 & 0.788 & 8.0 & $<$1\,s \\
+\midrule
+2 & Frozen-feature $k$NN (ours) & 0.877 {\scriptsize[.847, .904]} & 0.908 & 0.513 & \textbf{0.972} & 0.397 & 0.833 & 3.9 & 4\,s \\
+\midrule
+3 & Supervised DenseNet121 (3 seeds) & \textbf{0.974{\scriptsize$\pm$.004}} {\scriptsize[.962, .984]} & \textbf{0.982{\scriptsize$\pm$.003}} & \textbf{0.841{\scriptsize$\pm$.022}} & 0.967{\scriptsize$\pm$.003} & \textbf{0.829{\scriptsize$\pm$.023}} & \textbf{0.934{\scriptsize$\pm$.006}} & 4.4 & 10.2\,min \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Main results on the frozen official test set (234 NORMAL / 390 PNEUMONIA). All methods share one split; $\tau$ is chosen on validation only and an alert is raised when $s(x) > \tau$. Mean{\scriptsize$\pm$std} over seeds where a method has more than one; 95\% CI by stratified bootstrap (2000 resamples). Paired bootstrap: Tier~2 vs.\ Tier~1 (edge $3\sigma$) $\Delta$ROC-AUC $= +0.065$ [0.030, 0.100], $p <.001$; Tier~3 vs.\ Tier~2 $\Delta = +0.096$ [0.071, 0.123], $p <.001$. Latency is end-to-end per image (JPEG decode, resize, scoring); Tier~1 features run on CPU, Tiers~2--3 on one RTX~3090. Best value per column in bold.}
+\label{tab:main}
+\end{table*}

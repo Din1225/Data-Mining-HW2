@@ -1,0 +1,24 @@
+% 由 src/export_latex.py 自動產生；請勿手動修改。
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{lcccc}
+\toprule
+Variant (one change) & ROC-AUC & $\Delta$ & 95\% CI of $\Delta$ & $p$ \\
+\midrule
+Full method & 0.877 & --- & --- & --- \\
+\midrule
+Mahalanobis scorer & 0.864 & $-$.013 & {\scriptsize[$-$.028, .000]} & .056 \\
+Aspect-preserving crop & 0.887 & +.009 & {\scriptsize[$-$.012, +.031]} & .414 \\
+90\% of normal bank & 0.877{\scriptsize$\pm$.004} & $-$.001 & {\scriptsize[$-$.003, +.001]} & .332 \\
+1\% contamination & 0.860{\scriptsize$\pm$.009} & $-$.017$^\dagger$ & {\scriptsize[$-$.023, $-$.013]} & $<$.001 \\
+5\% contamination & 0.769{\scriptsize$\pm$.005} & $-$.108$^\dagger$ & {\scriptsize[$-$.128, $-$.089]} & $<$.001 \\
+10\% contamination & 0.714{\scriptsize$\pm$.023} & $-$.163$^\dagger$ & {\scriptsize[$-$.190, $-$.138]} & $<$.001 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Controlled ablations of the Tier~2 detector (test ROC-AUC). Full method: block3 features, L2 normalization, $k{=}2$, stretch resize, clean train-NORMAL bank. Each row changes exactly one factor; $\Delta$, CI and $p$ from a paired bootstrap. Rows with 3 seeds vary the injected or sub-sampled images. $^\dagger$: $|\Delta|$ exceeds the seed-to-seed std.}
+\label{tab:ablation}
+\end{table}

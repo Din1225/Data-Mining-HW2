@@ -1,0 +1,24 @@
+% 由 src/export_latex.py 自動產生；請勿手動修改。
+\begin{table*}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{cllccccccc}
+\toprule
+ & & & & & & & & \multicolumn{2}{c}{Hot patches} \\
+\cmidrule(lr){9-10}
+\# & Type & Image ID & W$\times$H & AR & Edge & $s(x)$ & $s(x)-\tau$ & Top & Center \\
+\midrule
+1 & FP (worst) & \texttt{NORMAL2-IM-0098-0001} & 1266$\times$1044 & 1.21 & .0145 & .212 & +.0946 & 49\% & 0\% \\
+2 & FP (worst) & \texttt{IM-0022-0001} & 1300$\times$617 & 2.11 & .0109 & .206 & +.0885 & 64\% & 8\% \\
+3 & FP (near) & \texttt{NORMAL2-IM-0277-0001} & 1754$\times$1377 & 1.27 & .0183 & .118 & +.0003 & 100\% & 0\% \\
+4 & FN (worst) & \texttt{person63\_virus\_121} & 1504$\times$1032 & 1.46 & .0148 & .109 & $-$.0092 & 73\% & 0\% \\
+5 & FN (worst) & \texttt{person154\_bacteria\_728} & 1558$\times$1218 & 1.28 & .0194 & .110 & $-$.0078 & --- & --- \\
+6 & FN (near) & \texttt{person20\_virus\_51} & 1320$\times$1208 & 1.09 & .0144 & .117 & $-$.0003 & 60\% & 0\% \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Failure cases of Tier~2 on the test set at $\tau=0.118$ (validation sensitivity $\geq$ 95\%). ``worst'' = farthest from $\tau$ on the wrong side, ``near'' = closest. Hot patches: share of above-threshold heatmap patches in the top three rows (18.75\% of the area: neck, shoulders, field-of-view edge) and in the central $8{\times}8$ block (25\%: approximately the lung fields).}
+\label{tab:cases}
+\end{table*}

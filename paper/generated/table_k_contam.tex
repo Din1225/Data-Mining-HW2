@@ -1,0 +1,24 @@
+% 由 src/export_latex.py 自動產生；請勿手動修改。
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{ccccc}
+\toprule
+ & \multicolumn{4}{c}{PNEUMONIA share of the memory bank} \\
+\cmidrule(lr){2-5}
+$k$ & 0\% & 1\% & 5\% & 10\% \\
+\midrule
+1 & 0.875 & 0.851{\scriptsize$\pm$.013} & 0.753{\scriptsize$\pm$.010} & 0.706{\scriptsize$\pm$.026} \\
+2$^\ast$ & \textbf{0.877} & 0.860{\scriptsize$\pm$.009} & 0.769{\scriptsize$\pm$.005} & 0.714{\scriptsize$\pm$.023} \\
+5 & 0.877 & 0.866{\scriptsize$\pm$.005} & 0.792{\scriptsize$\pm$.004} & 0.727{\scriptsize$\pm$.017} \\
+10 & 0.876 & \textbf{0.869{\scriptsize$\pm$.002}} & 0.811{\scriptsize$\pm$.005} & 0.744{\scriptsize$\pm$.013} \\
+20 & 0.873 & 0.869{\scriptsize$\pm$.002} & 0.830{\scriptsize$\pm$.005} & 0.767{\scriptsize$\pm$.010} \\
+50 & 0.869 & 0.866{\scriptsize$\pm$.001} & \textbf{0.845{\scriptsize$\pm$.002}} & \textbf{0.802{\scriptsize$\pm$.006}} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Test ROC-AUC of Tier~2 versus $k$ and training contamination (mean{\scriptsize$\pm$std} over 3 seeds of injected images; the 0\% column is deterministic). $^\ast$: $k$ selected on validation. Analysis only; the reported method was not changed based on this sweep.}
+\label{tab:k-contam}
+\end{table}

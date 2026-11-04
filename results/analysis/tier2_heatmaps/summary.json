@@ -1,0 +1,79 @@
+{
+  "patch_bank_size": 310784,
+  "display_reference_val_normal_p99": 0.6349936127662659,
+  "val_spearman_max_patch_vs_global_score": 0.7279087882686023,
+  "ring_width_patches": 2,
+  "region_area_share": {
+    "ring": 0.4375,
+    "top": 0.1875,
+    "center": 0.25
+  },
+  "gallery": [
+    {
+      "title": "TP (highest s)",
+      "path": "test/PNEUMONIA/person81_bacteria_397.jpeg",
+      "outcome": "TP",
+      "global_score": 0.23214917198142412,
+      "max_patch_distance": 0.7932707667350769,
+      "hot_patches": 95,
+      "hot_ring_share": 0.5368421052631579,
+      "hot_top_share": 0.3894736842105263,
+      "hot_center_share": 0.18947368421052632
+    },
+    {
+      "title": "TP (median s)",
+      "path": "test/PNEUMONIA/person155_bacteria_731.jpeg",
+      "outcome": "TP",
+      "global_score": 0.151423643573004,
+      "max_patch_distance": 0.7566453814506531,
+      "hot_patches": 26,
+      "hot_ring_share": 1.0,
+      "hot_top_share": 0.9230769230769231,
+      "hot_center_share": 0.0
+    },
+    {
+      "title": "FP (worst)",
+      "path": "test/NORMAL/NORMAL2-IM-0098-0001.jpeg",
+      "outcome": "FP",
+      "global_score": 0.21233810289532618,
+      "max_patch_distance": 0.7632763981819153,
+      "hot_patches": 51,
+      "hot_ring_share": 0.35294117647058826,
+      "hot_top_share": 0.49019607843137253,
+      "hot_center_share": 0.0
+    },
+    {
+      "title": "FP (worst)",
+      "path": "test/NORMAL/IM-0022-0001.jpeg",
+      "outcome": "FP",
+      "global_score": 0.2062695962444046,
+      "max_patch_distance": 0.7956364154815674,
+      "hot_patches": 36,
+      "hot_ring_share": 0.6666666666666666,
+      "hot_top_share": 0.6388888888888888,
+      "hot_center_share": 0.08333333333333333
+    },
+    {
+      "title": "FN (worst)",
+      "path": "test/PNEUMONIA/person63_virus_121.jpeg",
+      "outcome": "FN",
+      "global_score": 0.1085148566845299,
+      "max_patch_distance": 0.8758416771888733,
+      "hot_patches": 11,
+      "hot_ring_share": 1.0,
+      "hot_top_share": 0.7272727272727273,
+      "hot_center_share": 0.0
+    },
+    {
+      "title": "TN (lowest s)",
+      "path": "test/NORMAL/NORMAL2-IM-0323-0001.jpeg",
+      "outcome": "TN",
+      "global_score": 0.09067727043872625,
+      "max_patch_distance": 0.48191431164741516,
+      "hot_patches": 0,
+      "hot_ring_share": NaN,
+      "hot_top_share": NaN,
+      "hot_center_share": NaN
+    }
+  ]
+}

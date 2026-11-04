@@ -1,0 +1,22 @@
+% 由 src/export_latex.py 自動產生；需要 \usepackage{tikz} 與 \usetikzlibrary{positioning,arrows.meta}。
+\begin{figure*}[t]
+\centering
+\footnotesize
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[stage/.style={draw, rounded corners=2pt, align=center, minimum height=2.6cm, text width=2.55cm, inner sep=3pt}]
+\node[stage, fill=white] (s0) {\textbf{1. Input}\\[2pt]chest X-ray\\$x \in \mathbb{R}^{H\times W}$\\grayscale,\\variable size};
+\node[stage, fill=white, right=0.28cm of s0] (s1) {\textbf{2. Preprocess}\\[2pt]resize to\\$256{\times}256$, copy\\to 3 channels,\\ImageNet mean/std};
+\node[stage, fill=black!8, right=0.28cm of s1] (s2) {\textbf{3. Encoder}\\[2pt]frozen DenseNet121\\(ImageNet), block3\\GAP $\rightarrow z\in\mathbb{R}^{1024}$\\L2-normalize};
+\node[stage, fill=black!8, right=0.28cm of s2] (s3) {\textbf{4. Score $s(x)$}\\[2pt]mean L2 distance\\to $k{=}2$ nearest of\\1,214 train-\\NORMAL $z$};
+\node[stage, fill=black!8, right=0.28cm of s3] (s4) {\textbf{5. Threshold}\\[2pt]$\tau=0.118$\\chosen on val\\(sens.\ $\geq$ 95\%)\\test unused};
+\node[stage, fill=white, right=0.28cm of s4] (s5) {\textbf{6. Alert}\\[2pt]$s(x)>\tau$:\\flag for\\radiologist review\\(+ heatmap)};
+\draw[-{Stealth[length=4pt]}] (s0) -- (s1);
+\draw[-{Stealth[length=4pt]}] (s1) -- (s2);
+\draw[-{Stealth[length=4pt]}] (s2) -- (s3);
+\draw[-{Stealth[length=4pt]}] (s3) -- (s4);
+\draw[-{Stealth[length=4pt]}] (s4) -- (s5);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Tier~2 pipeline. Only train-NORMAL images enter the memory bank; validation (with labels) selects the layer, normalization, $k$ and $\tau$; the test set is scored once. Shaded stages are the detector proper.}
+\label{fig:pipeline}
+\end{figure*}

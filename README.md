@@ -45,7 +45,10 @@ HW2/
 │   ├── tier2_feature_knn.py
 │   ├── tier3_densenet.py
 │   ├── evaluation.py
-│   └── error_analysis.py
+│   ├── error_analysis.py
+│   ├── tier2_heatmap.py
+│   └── export_latex.py
+├── paper/                              # 論文素材：自動產生的 LaTeX 表格、pipeline 圖、數字 macro 與圖檔（見 paper/README.md）
 ├── requirements.txt                      # 所需套件
 └── README.md                           # 專案與執行說明
 ```
@@ -78,6 +81,8 @@ python -m pip install -r requirements.txt
 | `src/tier2_feature_knn.py` | Tier 2 primary method：凍結的 ImageNet DenseNet121 特徵上做 one-class kNN（memory bank 只含 train/NORMAL）。子指令 `extract`（GPU 提取特徵）、`select`（只用 val ROC-AUC 選 layer/normalize/k）、`score`（輸出分數；支援 Mahalanobis、contamination 與 bank-fraction ablation） |
 | `src/tier3_densenet.py` | Tier 3 strong reference：監督式 DenseNet121 fine-tuning；recipe 改寫自 [yenkuliu/pneumonia-classification](https://github.com/yenkuliu/pneumonia-classification)（MIT），改用本專案 manifest，score 為 logit 差 |
 | `src/error_analysis.py` | 在所有設計定案、test 評估完成後才執行：以 val 選出的 τ 將 test 分成 TP/FP/TN/FN，挑出最嚴重與 near-miss 的 FP/FN（附最近的 train/NORMAL 鄰居），比較 FP 與 TN 的拍攝特徵及 train/test 分布偏移（KS），並輸出案例圖庫與分數分布圖 |
+| `src/tier2_heatmap.py` | Tier 2 可解釋性：以 block3 patch 特徵對 train/NORMAL patch bank 做最近鄰，畫出 anomaly heatmap，並統計高熱 patch 落在上緣、外圈與中央肺野的比例（需要 GPU） |
+| `src/export_latex.py` | 由 `results/` 自動產生論文用的 LaTeX 表格、TikZ pipeline 圖與數字 macro，輸出到 `paper/` |
 | `src/evaluation.py` | 所有 tiers 共用的評估：驗證分數檔與 manifest 一致，計算 ROC-AUC、PR-AUC、Sens@Spec95、Spec@Sens95；只用 val 選 τ（normal_percentile、best_f1、sensitivity_target、fixed），並以 stratified／paired bootstrap 估計 95% CI 與 p 值 |
 
 
@@ -102,8 +107,12 @@ for s in 0 1 2; do CUDA_VISIBLE_DEVICES=<free_gpu> python src/tier3_densenet.py 
 # 所有方法共用的評估
 python src/evaluation.py --reference tier2_knn
 
-# §8 error analysis（test 評估完成後）
+# §8 error analysis 與 heatmap（test 評估完成後）
 python src/error_analysis.py --method tier2_knn --score-label "kNN score s(x) (mean L2 distance, k=2)"
+CUDA_VISIBLE_DEVICES=<free_gpu> python src/tier2_heatmap.py
+
+# 匯出論文用 LaTeX 表格與圖（paper/）
+python src/export_latex.py
 ```
 
 - $\tau$ 只由 val 決定：`normal_percentile` 取 val NORMAL 分數的第 95 百分位（目標 FPR 5%），`best_f1` 取 val F1 最高者，`sensitivity_target` 取 val sensitivity ≥ 95% 的最大 $\tau$；`method.json` 若有 `fixed_threshold` 則另加 `fixed`。

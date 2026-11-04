@@ -1,0 +1,22 @@
+% 由 src/export_latex.py 自動產生；請勿手動修改。
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{lcccc}
+\toprule
+Outcome & $n$ & Hot / img & Top rows & Center $8{\times}8$ \\
+\midrule
+TP & 379 & 34.2 & 56\% & 3\% \\
+FP & 141 & 5.9 & 63\% & 1\% \\
+TN & 93 & 1.6 & 84\% & 0\% \\
+FN & 11 & 4.5 & 86\% & 0\% \\
+\midrule
+Area share & & & 19\% & 25\% \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Where the patch-level anomaly evidence of Tier~2 lies on the test set. A patch is hot if its distance to the nearest train-NORMAL patch exceeds the 99th percentile of validation-NORMAL patch distances; shares pool all hot patches of a group. The image-level maximum patch distance tracks the global $k$NN score on validation (Spearman $\rho=0.73$).}
+\label{tab:heat}
+\end{table}
