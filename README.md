@@ -14,6 +14,10 @@ HW2/
 │   ├── TaskDefinition_Labels_ClassImbalance.md
 │   └── Exploratory_Feature_Analysis.md
 ├── results/
+│   ├── leakage/                        # 切分間的群組重疊與重複影像檢查
+│   │   ├── group_overlap.csv
+│   │   ├── personn_numbering.csv
+│   │   └── duplicate_files.csv
 │   └── eda/                            # EDA 特徵、統計表與圖表
 │       ├── image_features.csv
 │       ├── feature_summary.csv
@@ -26,6 +30,7 @@ HW2/
 │   ├── download_pneumonia.py
 │   ├── data_split.py
 │   ├── data_statistics.py
+│   ├── check_leakage.py
 │   └── eda.py
 ├── requirements.txt                      # 所需套件
 └── README.md                           # 專案與執行說明
@@ -53,6 +58,7 @@ python -m pip install -r requirements.txt
 | `src/download_pneumonia.py` | 使用 `kagglehub` 下載 Chest X-Ray Pneumonia 資料集，並顯示下載位置 |
 | `src/data_split.py` | 合併官方 train/val，以 seed 42 進行 stratified、group-aware 的 90/10 train/validation 切分，並完整保留官方 test |
 | `src/data_statistics.py` | 讀取固定 manifest，輸出資料數量、影像尺寸、類別比例與；不建立文件 |
+| `src/check_leakage.py` | 讀取固定 manifest，以「檔名群組」與「檔名群組＋肺炎類型」檢查 train/val/test 的群組重疊，檢驗 personN 是否依 bacteria/virus 各自編號，並以 SHA-256 找出重複影像；發現跨 split 洩漏時以狀態 1 結束 |
 | `src/eda.py` | 只使用新 train 的 NORMAL/PNEUMONIA 提取影像特徵，計算 KS、Wasserstein、MI、point-biserial correlation 與 Spearman correlation，並輸出 CSV 與圖表 |
 
 

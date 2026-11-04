@@ -1,0 +1,7 @@
+group_key,split_a,split_b,shared_groups,split_a_images_in_shared,split_b_images_in_shared,example_groups
+filename_group,train,val,0,0,0,
+filename_group,train,test,150,411,283,PNEUMONIA:person1;PNEUMONIA:person10;PNEUMONIA:person100;PNEUMONIA:person101;PNEUMONIA:person102
+filename_group,val,test,20,46,37,PNEUMONIA:person111;PNEUMONIA:person114;PNEUMONIA:person133;PNEUMONIA:person14;PNEUMONIA:person146
+filename_group_with_type,train,val,0,0,0,
+filename_group_with_type,train,test,0,0,0,
+filename_group_with_type,val,test,0,0,0,

@@ -1,0 +1,8 @@
+metric,value
+development_ids,1642
+development_ids_with_both_types,808
+test_ids,202
+test_ids_with_both_types,1
+shared_ids,170
+shared_ids_same_type,0
+expected_same_type_rate_if_random,0.46926557605290636
