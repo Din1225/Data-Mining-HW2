@@ -83,6 +83,7 @@
 |---|---|---|
 | 三個 tier 用同一份切分 | ✅ | 同一份 manifest；`evaluation.py` 會檢查分數檔與 manifest 一致 |
 | One-class 模型只用正常資料訓練 | ✅ | T2 bank 只含 train NORMAL；T3 是監督式參考，論文要明講 |
+| §6 列出每個 tier 的訓練樣本數（NORMAL vs 異常；助教 11/06 補充） | ✅ | `paper/generated/table_train_counts.tex`；混入異常的版本只出現在污染 ablation，異常影像取自同一個 train split |
 | τ 只用 val 選、test 只評估一次 | ✅ | `evaluation.py` 的 τ 策略都只讀 val |
 | ≥ 2 個指標，並以錯誤代價說明 | ✅（說明待寫） | ROC-AUC、PR-AUC、Sens@Spec95、PPV@5%；**選擇理由需寫進論文** |
 | ≥ 3 seeds 的 mean ± std | ⚠️ 需說明 | T3 與 random 有 3 seeds。T2 kNN 是確定性的（凍結特徵 + 精確 kNN），換 seed 結果完全相同；論文改用 bootstrap CI，並可引用 bank 90% 三個 seed 的 0.877 ± 0.004 |

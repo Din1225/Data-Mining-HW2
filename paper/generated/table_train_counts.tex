@@ -1,0 +1,25 @@
+% 由 src/export_latex.py 自動產生；請勿手動修改。
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{clccl}
+\toprule
+ & & \multicolumn{2}{c}{Train images} & \\
+\cmidrule(lr){3-4}
+Tier & Method & NORMAL & PNEU. & Val labels used for \\
+\midrule
+1 & Constant, random & 0 & 0 & $\tau$ \\
+1 & Edge $3\sigma$, aspect-ratio probe & 1,214 & 0 & $\tau$ \\
+2 & $k$NN (ours), Mahalanobis & 1,214 & 0 & config, $\tau$ \\
+2 & Crop / pooling-region abl. & 1,214 & 0 & $\tau$ \\
+2 & 90\% bank abl. & 1,093 & 0 & $\tau$ \\
+2 & 1/5/10\% contamination abl. & 1,214 & 12/64/135 & $\tau$ \\
+3 & Supervised DenseNet121 & 1,214 & 3,494 & checkpoint, $\tau$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Training images per method. All tiers start from the same split (train 1,214/3,494, val 135/389, test 234/390 NORMAL/PNEUMONIA), are tuned on the same validation set and evaluated once on the same test set. Tiers~1--2 fit on train NORMAL only; contamination ablations inject PNEUMONIA images drawn from the same train split (3 seeds). Validation labels are used only for the listed selections.}
+\label{tab:train-counts}
+\end{table}

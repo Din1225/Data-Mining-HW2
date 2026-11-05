@@ -31,7 +31,7 @@ python src/export_latex.py
 | §3 Task & Data | `doc/` 既有文件；`results/leakage/` | 異常是**多數類**：test 62.5% PNEUMONIA（`\PrevalenceTest`）。Tier 1 常數分數用 best-F1 選 τ 會退化成「全部判肺炎」（F1 0.769、accuracy 0.625），比 always-normal 更能說明 accuracy／F1 的陷阱。 |
 | §4 EDA | `figures/eda_feature_distributions.png`、`figures/eda_feature_scatter.png` | 既有 EDA；H1（紋理）、H2（對比）。 |
 | §5 Method | `generated/figure_pipeline.tex`（`fig:pipeline`） | 評分表要求的 Tier 2 pipeline 圖。s(x) = 到 1,214 張 train-NORMAL 特徵中 k=2 個最近鄰的平均 L2 距離；τ = `\TTwoTau`（val sensitivity ≥ 95%）。 |
-| §6 Setup | 見下方「設定細節」 | 切分、搜尋範圍、硬體與套件版本。 |
+| §6 Setup | `generated/table_train_counts.tex`（`tab:train-counts`）；見下方「設定細節」 | **各 tier 的訓練樣本數（助教規定必列）**、切分、搜尋範圍、硬體與套件版本。 |
 | §7 Results | `table_main.tex`（`tab:main`）、`table_ablation.tex`（`tab:ablation`）、`table_k_contam.tex`（`tab:k-contam`）、`table_tau_transfer.tex`（`tab:tau-transfer`）、`figures/score_distributions.png` | 主表、單變因 ablation、k × contamination、τ 轉移。 |
 | §8 Analysis | `table_cases.tex`（`tab:cases`）、`table_shift.tex`（`tab:shift`）、`table_heat.tex`（`tab:heat`）、`figures/case_gallery.png`、`figures/heatmap_gallery.png`、`figures/aspect_ratio_shift.png` | 失敗案例、train/test 拍攝偏移、heatmap 的證據位置。 |
 
@@ -51,6 +51,7 @@ python src/export_latex.py
 - **偏移集中在 test 的 NORMAL**：寬高比 KS 0.340、edge strength KS 0.248；PNEUMONIA 僅 0.052／0.069。
 - **最嚴重的 FP 是拍攝瑕疵**（#1 黑色邊框、#2 寬高比 2.11 的窄裁切）；**FN 全是 near miss**（距 τ < 0.01）。
 - **「第一個修正」已有實證**（Table `tab:ablation` 的 Pool 列）：只在 block3 特徵圖的中央 12×12 做 pooling（去掉外圈 2 圈），test ROC-AUC 0.877 → **0.906**（+0.029 [+0.014, +0.046]，p < .001；PR-AUC +0.021，p = 0.010）；以 val NORMAL p95 設定 τ 時，test FPR 從 38.5% 降到 22.2%。中央 8×8 為 +0.022（p = 0.04）；只去掉上緣 3 列為 +0.005（不顯著）。val 上幾乎沒差（0.964 vs 0.967），差距只在分布偏移的 test 上出現，正是「肺野外線索在同分布下有用、在偏移下有害」的捷徑特徵。**必須同時寫明**：這組是看完 §8 error analysis 才設計的診斷實驗，主方法沒有因此更換；Sens@Spec95 反而從 0.513 降到 0.467。
+- **比較是公平的**（對照助教 2026-11-06 的說明）：三個 tier 從同一份 train/val/test 切分出發、用同一個 val 調參、同一個 test 評估；one-class 方法有只用 train NORMAL 的乾淨 baseline，混入異常只出現在 ablation；監督式 Tier 3 使用同一個 train split 的異常樣本。
 - **Heatmap 的證據多在肺野外**：TP 的高熱 patch 有 56% 在最上 3 列（占面積 19%），只有 3% 在中央 8×8（25%）；heatmap 最大值與全域分數在 val 上 Spearman ρ = `\HeatValSpearman`。結論：解釋可信（反映模型依據），但模型依據的是擺位／取景，**臨床上不應信任**。
 
 **不能寫（沒有證據或已被否定）**
@@ -74,6 +75,7 @@ T2 比 T1 每千張少 163 個誤報；T3 再少 410 個。5% 盛行率是假設
 
 ## 設定細節（§6）
 
+- **訓練樣本數（助教 2026-11-06 來信要求寫在 §6）**：請放 Table `tab:train-counts`。Tier 1／2 只用 train NORMAL 1,214 張（one-class 的乾淨 baseline）；Tier 3 監督式用 train 全部 1,214 NORMAL + 3,494 PNEUMONIA；污染 ablation 混入的 12/64/135 張肺炎影像也取自同一個 train split。所有方法用同一個 val 調參、在同一個 test 只評估一次。val 的標籤只用於選 τ 與模型設定（Tier 2 的 layer/normalize/k、Tier 3 的 checkpoint）。
 - **切分**：官方 train+val 合併後依標籤分層、依檔名推定病人群組 90/10 切分（seed 42）：train 4,708（1,214 N / 3,494 P）、val 524（135 / 389）、test 為官方 test 624（234 / 390）。`src/check_leakage.py`：以（personN, bacteria/virus）為群組時 test 與 train/val 重疊 0；無跨 split 的重複檔。
 - **Tier 1**：μ、σ 只用 train/NORMAL；s(x) = |x − μ| / σ，classic 3σ 為固定 τ = 3。
 - **Pooling-region ablation**：block3 特徵圖 16×16 上的固定區域：去掉上緣 3 列（81% 面積）、中央 12×12（56%）、中央 8×8（25%）；其餘設定（L2、k=2）不變。

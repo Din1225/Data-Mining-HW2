@@ -5,6 +5,7 @@
 - generated/table_main.tex         §7 主結果表（三個 tiers，同一個 test split）
 - generated/table_ablation.tex     §7 controlled ablation（相對 Tier 2 完整方法的 Δ 與 paired bootstrap）
 - generated/table_k_contam.tex     §7 k × contamination 交叉 ablation
+- generated/table_train_counts.tex §6 各 tier 的訓練樣本數（NORMAL vs PNEUMONIA，依助教規定列出）
 - generated/table_tau_transfer.tex §7/§8 τ 在 val 與 test 的 FPR（threshold 轉移）
 - generated/table_shift.tex        §8 train vs test 的拍攝特徵偏移（KS）
 - generated/table_cases.tex        §8 失敗案例（ID、尺寸、s(x)、τ、margin、最近正常鄰居、熱區位置）
@@ -248,6 +249,62 @@ def table_k_contamination(project_dir: Path) -> str:
     return wrap_table(body, caption, "tab:k-contam", wide=False, columns="ccccc")
 
 
+# §6 依助教要求逐一列出各 tier 實際使用的訓練樣本數（NORMAL vs PNEUMONIA）。
+# Tier 1／2 的數字讀自 method.json 記錄的 fit_images／bank_sizes；Tier 3 的
+# tier3_densenet.py 使用 manifest 中 train split 的全部影像，因此直接由 manifest 計數。
+def table_train_counts(project_dir: Path) -> str:
+    counts = {(split, label): 0 for split in ("train", "val", "test") for label in ("NORMAL", "PNEUMONIA")}
+    for row in read_csv(project_dir / "data" / "chest_xray" / "re-split" / "manifest.csv"):
+        counts[(row["new_split"], row["label"])] += 1
+    train_normal, train_anomaly = counts[("train", "NORMAL")], counts[("train", "PNEUMONIA")]
+
+    methods_dir = project_dir / "results" / "methods"
+
+    def info(name: str) -> dict:
+        return json.loads((methods_dir / name / "method.json").read_text(encoding="utf-8"))
+
+    def bank(name: str) -> tuple[int, int]:
+        sizes = {(size["normal"], size["pneumonia"]) for size in info(name)["bank_sizes"]}
+        if len(sizes) != 1:
+            raise RuntimeError(f"{name} 各 seed 的 bank 大小不一致：{sizes}")
+        return sizes.pop()
+
+    for name in ("tier1_edge_3sigma", "tier1_aspect_ratio_probe"):
+        if info(name)["fit_images"] != train_normal:
+            raise RuntimeError(f"{name} 的 fit_images 與 train/NORMAL 數量不符")
+    clean = ("tier2_knn", "tier2_mahalanobis", "tier2_knn_crop",
+             "tier2_knn_region_notop3", "tier2_knn_region_ring2", "tier2_knn_region_center8")
+    for name in clean:
+        if bank(name) != (train_normal, 0):
+            raise RuntimeError(f"{name} 的 memory bank 不是完整的 train/NORMAL")
+    bank90_normal, _ = bank("tier2_knn_bank90")
+    injected = "/".join(str(bank(f"tier2_knn_contam{c}")[1]) for c in ("01", "05", "10"))
+
+    def n(value: int) -> str:
+        return f"{value:,}"
+
+    body = [
+        " & & \\multicolumn{2}{c}{Train images} & \\\\", "\\cmidrule(lr){3-4}",
+        "Tier & Method & NORMAL & PNEU. & Val labels used for \\\\", "\\midrule",
+        "1 & Constant, random & 0 & 0 & $\\tau$ \\\\",
+        f"1 & Edge $3\\sigma$, aspect-ratio probe & {n(train_normal)} & 0 & $\\tau$ \\\\",
+        f"2 & $k$NN (ours), Mahalanobis & {n(train_normal)} & 0 & config, $\\tau$ \\\\",
+        f"2 & Crop / pooling-region abl. & {n(train_normal)} & 0 & $\\tau$ \\\\",
+        f"2 & 90\\% bank abl. & {n(bank90_normal)} & 0 & $\\tau$ \\\\",
+        f"2 & 1/5/10\\% contamination abl. & {n(train_normal)} & {injected} & $\\tau$ \\\\",
+        f"3 & Supervised DenseNet121 & {n(train_normal)} & {n(train_anomaly)} & checkpoint, $\\tau$ \\\\",
+    ]
+    caption = (
+        "Training images per method. All tiers start from the same split (train "
+        f"{n(train_normal)}/{n(train_anomaly)}, val {counts[('val', 'NORMAL')]}/{counts[('val', 'PNEUMONIA')]}, "
+        f"test {counts[('test', 'NORMAL')]}/{counts[('test', 'PNEUMONIA')]} NORMAL/PNEUMONIA), are tuned on the same "
+        "validation set and evaluated once on the same test set. Tiers~1--2 fit on train NORMAL only; contamination "
+        "ablations inject PNEUMONIA images drawn from the same train split (3 seeds). Validation labels are used only "
+        "for the listed selections."
+    )
+    return wrap_table(body, caption, "tab:train-counts", wide=False, columns="clccl")
+
+
 def table_tau_transfer(project_dir: Path) -> str:
     split_dir = project_dir / "data" / "chest_xray" / "re-split"
     expected = read_expected_labels(split_dir / "manifest.csv")
@@ -435,6 +492,7 @@ def main() -> None:
         "table_main.tex": table_main(results, args.strategy),
         "table_ablation.tex": table_ablation(results),
         "table_k_contam.tex": table_k_contamination(project_dir),
+        "table_train_counts.tex": table_train_counts(project_dir),
         "table_tau_transfer.tex": table_tau_transfer(project_dir),
         "table_shift.tex": table_shift(analysis_dir),
         "table_cases.tex": table_cases(analysis_dir, heatmap_dir),
