@@ -9,6 +9,10 @@
 - 分數：kNN 為到 memory bank 中 k 個最近鄰的平均 Euclidean 距離（Bergman et al., 2020）；
   mahalanobis 為 Ledoit-Wolf shrinkage 共變異數下的 Mahalanobis 距離平方（scoring-function ablation）。
 - 前處理與 Tier 3 的 evaluation transform 相同（tier3_densenet.build_transforms），兩者只差在是否使用標籤。
+- Pooling-region ablation：block3 特徵圖（16×16）只在部分區域做 average pooling——去掉上緣 3 列
+  （block3_notop3）、去掉外圈 2 圈（block3_ring2）、只留中央 8×8（block3_center8）。影像以 full-frame
+  拉伸成正方形，中央區域大致對應肺野；這是特徵空間中的近似肺野裁切，不是肺野分割。
+  這些區域不在 select 的搜尋範圍內，只用於 ablation。
 
 子指令：
 1. extract：在 GPU 上對 train/val/test 所有影像提取特徵，快取到 cache/tier2_features/。
@@ -32,6 +36,12 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 
 
 LAYERS = ("final", "block3", "concat")
+# block3 特徵圖上的 pooling 區域（列 slice, 行 slice），以特徵圖邊長 size 表示。
+REGION_LAYERS = {
+    "block3_notop3": lambda size: (slice(3, size), slice(0, size)),
+    "block3_ring2": lambda size: (slice(2, size - 2), slice(2, size - 2)),
+    "block3_center8": lambda size: (slice(size // 4, 3 * size // 4), slice(size // 4, 3 * size // 4)),
+}
 NORMALIZATIONS = ("none", "l2")
 K_GRID = (1, 2, 5, 10, 20, 50)
 SCORERS = ("knn", "mahalanobis")
@@ -79,15 +89,21 @@ def extract_features(args: argparse.Namespace) -> None:
 
     final_features: list[np.ndarray] = []
     block3_features: list[np.ndarray] = []
+    region_features: dict[str, list[np.ndarray]] = {name: [] for name in REGION_LAYERS}
     torch.cuda.synchronize()
     start = time.perf_counter()
     with torch.no_grad():
         for batch_index, (images, _) in enumerate(loader, start=1):
             feature_map = model.features(images.to(device, non_blocking=True))
             final = F.adaptive_avg_pool2d(F.relu(feature_map), 1).flatten(1)
-            block3 = F.adaptive_avg_pool2d(captured["block3"], 1).flatten(1)
+            block3_map = captured["block3"]
+            block3 = F.adaptive_avg_pool2d(block3_map, 1).flatten(1)
             final_features.append(final.float().cpu().numpy())
             block3_features.append(block3.float().cpu().numpy())
+            for name, region in REGION_LAYERS.items():
+                rows_slice, columns_slice = region(block3_map.shape[-1])
+                pooled = block3_map[:, :, rows_slice, columns_slice].mean(dim=(2, 3))
+                region_features[name].append(pooled.float().cpu().numpy())
             if batch_index % 20 == 0:
                 print(f"已提取 {min(batch_index * args.batch_size, len(rows)):,}/{len(rows):,} 張", flush=True)
     torch.cuda.synchronize()
@@ -102,6 +118,7 @@ def extract_features(args: argparse.Namespace) -> None:
         labels=np.asarray([row["label"] for row in rows]),
         final=np.concatenate(final_features),
         block3=np.concatenate(block3_features),
+        **{name: np.concatenate(chunks) for name, chunks in region_features.items()},
         ms_per_image=np.asarray(1000.0 * seconds / len(rows)),
         gpu=np.asarray(torch.cuda.get_device_name(device)),
     )
@@ -122,6 +139,9 @@ class FeatureStore:
             self.splits = data["splits"].astype(str)
             self.labels = data["labels"].astype(str)
             self.layers = {"final": data["final"].astype(np.float64), "block3": data["block3"].astype(np.float64)}
+            for name in REGION_LAYERS:
+                if name in data.files:
+                    self.layers[name] = data[name].astype(np.float64)
             self.ms_per_image = float(data["ms_per_image"])
             self.gpu = str(data["gpu"])
         self.layers["concat"] = np.hstack([self.layers["final"], self.layers["block3"]])
@@ -310,7 +330,7 @@ def parse_args(project_dir: Path) -> argparse.Namespace:
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--method-name", default="tier2_knn")
     parser.add_argument("--scorer", choices=SCORERS, default="knn")
-    parser.add_argument("--layer", choices=LAYERS, help="預設使用 select 的結果")
+    parser.add_argument("--layer", choices=(*LAYERS, *REGION_LAYERS), help="預設使用 select 的結果")
     parser.add_argument("--normalize", choices=NORMALIZATIONS, help="預設使用 select 的結果")
     parser.add_argument("--k", type=int, help="預設使用 select 的結果")
     parser.add_argument("--contamination", type=float, default=0.0)

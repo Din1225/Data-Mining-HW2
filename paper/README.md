@@ -50,6 +50,7 @@ python src/export_latex.py
 - **τ 無法從 val 轉移到 test**：以 val NORMAL 第 95 百分位（目標 FPR 5%）設定 τ，test FPR 為 T2 38.5%、T3 52.1%。
 - **偏移集中在 test 的 NORMAL**：寬高比 KS 0.340、edge strength KS 0.248；PNEUMONIA 僅 0.052／0.069。
 - **最嚴重的 FP 是拍攝瑕疵**（#1 黑色邊框、#2 寬高比 2.11 的窄裁切）；**FN 全是 near miss**（距 τ < 0.01）。
+- **「第一個修正」已有實證**（Table `tab:ablation` 的 Pool 列）：只在 block3 特徵圖的中央 12×12 做 pooling（去掉外圈 2 圈），test ROC-AUC 0.877 → **0.906**（+0.029 [+0.014, +0.046]，p < .001；PR-AUC +0.021，p = 0.010）；以 val NORMAL p95 設定 τ 時，test FPR 從 38.5% 降到 22.2%。中央 8×8 為 +0.022（p = 0.04）；只去掉上緣 3 列為 +0.005（不顯著）。val 上幾乎沒差（0.964 vs 0.967），差距只在分布偏移的 test 上出現，正是「肺野外線索在同分布下有用、在偏移下有害」的捷徑特徵。**必須同時寫明**：這組是看完 §8 error analysis 才設計的診斷實驗，主方法沒有因此更換；Sens@Spec95 反而從 0.513 降到 0.467。
 - **Heatmap 的證據多在肺野外**：TP 的高熱 patch 有 56% 在最上 3 列（占面積 19%），只有 3% 在中央 8×8（25%）；heatmap 最大值與全域分數在 val 上 Spearman ρ = `\HeatValSpearman`。結論：解釋可信（反映模型依據），但模型依據的是擺位／取景，**臨床上不應信任**。
 
 **不能寫（沒有證據或已被否定）**
@@ -57,6 +58,8 @@ python src/export_latex.py
 - 「FP 的熱區集中在邊框」——外圈比例在 TP/FP/TN/FN 都很高（83–100%），無法區分。
 - 「aspect-preserving 前處理能修正捷徑」——不顯著。
 - 任何從 k × contamination 表回頭選 k 的說法——k 只由 val 選定（k=2）。
+- 「我們的方法（中央 pooling）達到 0.906」當作主結果——它是事後的診斷實驗；主表的 Tier 2 仍是 0.877。可以在 §8／§9 寫成「針對失敗模式的修正，初步驗證有效，需在新資料上確認」。
+- 「遮掉外圈 = 肺野分割」——只是特徵圖上的固定幾何區域，不是分割。
 - 與同學原 repo 的 0.905 accuracy 直接比較——那是不同切分、單一 seed；我們重訓的 Tier 3 在機率 0.5 下 accuracy 0.848±0.032、specificity 0.607±0.101。
 
 ## §8 實務影響（每 1000 張檢查，假設盛行率 5%，τ 為 val sensitivity ≥ 95%）
@@ -73,6 +76,7 @@ T2 比 T1 每千張少 163 個誤報；T3 再少 410 個。5% 盛行率是假設
 
 - **切分**：官方 train+val 合併後依標籤分層、依檔名推定病人群組 90/10 切分（seed 42）：train 4,708（1,214 N / 3,494 P）、val 524（135 / 389）、test 為官方 test 624（234 / 390）。`src/check_leakage.py`：以（personN, bacteria/virus）為群組時 test 與 train/val 重疊 0；無跨 split 的重複檔。
 - **Tier 1**：μ、σ 只用 train/NORMAL；s(x) = |x − μ| / σ，classic 3σ 為固定 τ = 3。
+- **Pooling-region ablation**：block3 特徵圖 16×16 上的固定區域：去掉上緣 3 列（81% 面積）、中央 12×12（56%）、中央 8×8（25%）；其餘設定（L2、k=2）不變。
 - **Tier 2**：ImageNet DenseNet121 完全凍結；只用 val ROC-AUC 在 layer ∈ {final, block3, concat} × normalize ∈ {none, L2} × k ∈ {1, 2, 5, 10, 20, 50} 中選擇 → block3、L2、k=2（val ROC-AUC 0.964）。Mahalanobis 用 Ledoit–Wolf shrinkage。
 - **Tier 3**：沿用組員 repo 的 recipe（AdamW，backbone lr 1e-5、head lr 5e-4、weight decay 5e-4、class weight NORMAL 1.5、dropout 0.25、2 epoch head warmup、凍結 BN、batch 16、cosine 20 epochs、patience 5、以 val balanced accuracy 選 checkpoint），seeds 0/1/2。
 - **τ 規則**：皆只用 val：NORMAL p95、best F1、sensitivity ≥ 95%（主表使用）；判定為 s(x) > τ。

@@ -10,6 +10,9 @@
     "tier2_knn_contam05",
     "tier2_knn_contam10",
     "tier2_knn_crop",
+    "tier2_knn_region_center8",
+    "tier2_knn_region_notop3",
+    "tier2_knn_region_ring2",
     "tier2_mahalanobis",
     "tier3_densenet121"
   ],

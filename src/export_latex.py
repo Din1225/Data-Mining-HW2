@@ -45,6 +45,9 @@ MAIN_METHODS = (
 ABLATIONS = (
     ("tier2_mahalanobis", "Mahalanobis scorer"),
     ("tier2_knn_crop", "Aspect-preserving crop"),
+    ("tier2_knn_region_notop3", "Pool w/o top 3 rows"),
+    ("tier2_knn_region_ring2", "Pool central $12{\\times}12$"),
+    ("tier2_knn_region_center8", "Pool central $8{\\times}8$"),
     ("tier2_knn_bank90", "90\\% of normal bank"),
     ("tier2_knn_contam01", "1\\% contamination"),
     ("tier2_knn_contam05", "5\\% contamination"),
@@ -210,8 +213,11 @@ def table_ablation(results: Results) -> str:
             f"{ci(float(gap['ci_low']), float(gap['ci_high']), sign=True)} & {p_text(float(gap['p_value']))} \\\\"
         )
     caption = (
-        "Controlled ablations of the Tier~2 detector (test ROC-AUC). Full method: block3 features, L2 normalization, "
-        "$k{=}2$, stretch resize, clean train-NORMAL bank. Each row changes exactly one factor; $\\Delta$, CI and $p$ "
+        "Controlled ablations of the Tier~2 detector (test ROC-AUC). Full method: block3 features average-pooled over "
+        "the whole $16{\\times}16$ map, L2 normalization, $k{=}2$, stretch resize, clean train-NORMAL bank. "
+        "``Pool'' rows restrict pooling to a central region of the feature map (an approximate lung-field crop, "
+        "not a segmentation); they were designed after the error analysis (Section~8) as a diagnostic, and the "
+        "reported method was not changed. Each row changes exactly one factor; $\\Delta$, CI and $p$ "
         "from a paired bootstrap. Rows with 3 seeds vary the injected or sub-sampled images. "
         "$^\\dagger$: $|\\Delta|$ exceeds the seed-to-seed std."
     )

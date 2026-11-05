@@ -259,6 +259,87 @@
     "inference_ms_per_image": 2.339010160135311,
     "feature_gpu": "NVIDIA GeForce RTX 3090"
   },
+  "tier2_knn_region_center8": {
+    "n_seeds": 1,
+    "name": "tier2_knn_region_center8",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3_center8",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 2.86086710426868,
+    "inference_ms_per_image": 2.3957413547458484,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_region_notop3": {
+    "n_seeds": 1,
+    "name": "tier2_knn_region_notop3",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3_notop3",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 2.8610672482839328,
+    "inference_ms_per_image": 2.437310835645479,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_region_ring2": {
+    "n_seeds": 1,
+    "name": "tier2_knn_region_ring2",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3_ring2",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 2.860919661129872,
+    "inference_ms_per_image": 2.4060630969713257,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
   "tier2_mahalanobis": {
     "n_seeds": 1,
     "name": "tier2_mahalanobis",
