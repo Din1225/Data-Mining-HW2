@@ -12,7 +12,8 @@ HW2/
 ├── doc/                                # 作業各章節的分析與說明
 │   ├── DataSplit_LeakagePrevention.md
 │   ├── TaskDefinition_Labels_ClassImbalance.md
-│   └── Exploratory_Feature_Analysis.md
+│   ├── Exploratory_Feature_Analysis.md
+│   └── MainExperiments_Summary.md      # 主實驗總覽（給組員）
 ├── results/
 │   ├── features/                       # 所有 split 的影像特徵快取（Tier 1 使用）
 │   ├── methods/                        # 各方法的 val/test 分數檔，一個方法一個資料夾
@@ -124,4 +125,5 @@ python src/export_latex.py
 - `doc/DataSplit_LeakagePrevention.md`：資料來源、重新切分原因、固定切分方法與 leakage-prevention protocol。
 - `doc/TaskDefinition_Labels_ClassImbalance.md`：normal/anomaly 定義、樣本與標籤規格、feature dimension、class imbalance 及評估限制。
 - `doc/Exploratory_Feature_Analysis.md`：training-only distribution contrast、feature separability、feature association、冗餘檢查與後續實驗假設。
+- `doc/MainExperiments_Summary.md`：主實驗（Tier 1–3、ablation、錯誤分析、heatmap）的總覽、結果、評分表對照與待辦事項。
 
