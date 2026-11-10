@@ -1,0 +1,47 @@
+{
+  "name": "tier3_densenet121",
+  "tier": 3,
+  "description": "Supervised DenseNet121 fine-tuning (ImageNet init); score = logit difference",
+  "source": "https://github.com/yenkuliu/pneumonia-classification (MIT License, Yen Ku Liu)",
+  "score": "logit_PNEUMONIA - logit_NORMAL",
+  "fixed_threshold": 0.0,
+  "config": {
+    "image_size": 256,
+    "preprocessing": "full_frame",
+    "batch_size": 16,
+    "epochs": 20,
+    "warmup_epochs": 2,
+    "early_stopping_patience": 5,
+    "backbone_lr": 1e-05,
+    "head_lr": 0.0005,
+    "weight_decay": 0.0005,
+    "dropout": 0.25,
+    "normal_class_weight": 1.5,
+    "pneumonia_class_weight": 1.0,
+    "horizontal_flip_p": 0.5,
+    "rotation_degrees": 10.0,
+    "color_jitter": 0.12,
+    "freeze_batchnorm": true,
+    "selection_metric": "val_balanced_accuracy"
+  },
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "best_epochs": [
+    11,
+    16,
+    3
+  ],
+  "train_seconds": 613.0339342299849,
+  "inference_ms_per_image": 4.3692452559181945,
+  "environment": {
+    "python": "3.11.18",
+    "torch": "2.14.1+cu126",
+    "torchvision": "0.29.1+cu126",
+    "cuda": "12.6",
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "workers": 8
+  }
+}

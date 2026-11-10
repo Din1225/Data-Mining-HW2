@@ -1,0 +1,12 @@
+{
+  "name": "tier1_random",
+  "tier": 1,
+  "description": "Uniform random score independent of the image",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "train_seconds": 0.0,
+  "inference_ms_per_image": 0.0
+}

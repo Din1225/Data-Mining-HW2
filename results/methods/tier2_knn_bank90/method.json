@@ -1,0 +1,38 @@
+{
+  "name": "tier2_knn_bank90",
+  "tier": 2,
+  "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+  "scorer": "knn",
+  "layer": "block3",
+  "normalize": "l2",
+  "k": 2,
+  "preprocessing": "full_frame",
+  "contamination": 0.0,
+  "bank_fraction": 0.9,
+  "bank_sizes": [
+    {
+      "seed": 0,
+      "normal": 1093,
+      "pneumonia": 0
+    },
+    {
+      "seed": 1,
+      "normal": 1093,
+      "pneumonia": 0
+    },
+    {
+      "seed": 2,
+      "normal": 1093,
+      "pneumonia": 0
+    }
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "selection": "results/tier2/selected_config_full_frame.json",
+  "train_seconds": 4.329727534473057,
+  "inference_ms_per_image": 3.9481101602307724,
+  "feature_gpu": "NVIDIA GeForce RTX 3090"
+}

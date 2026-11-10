@@ -1,0 +1,24 @@
+% 由 src/export_latex.py 自動產生；請勿手動修改。
+\begin{table}[t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{llccc}
+\toprule
+Method & $\tau$ rule (val) & Val FPR & Test FPR & Test Sens. \\
+\midrule
+T1 edge $3\sigma$ & NORMAL p95 & 5.2\% & 7.3\% & 50.8\% \\
+T1 edge $3\sigma$ & Sens.\,$\geq$\,95\% & 77.0\% & 77.4\% & 95.1\% \\
+\midrule
+T2 $k$NN & NORMAL p95 & 5.2\% & 38.5\% & 90.3\% \\
+T2 $k$NN & Sens.\,$\geq$\,95\% & 20.0\% & 60.3\% & 97.2\% \\
+\midrule
+T3 DenseNet & NORMAL p95 & 5.2\% & 52.1\% & 99.6\% \\
+T3 DenseNet & Sens.\,$\geq$\,95\% & 0.2\% & 17.1\% & 96.7\% \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Threshold transfer. $\tau$ is calibrated on validation (same acquisition pool as training) and applied unchanged to the official test set. NORMAL p95: 95th percentile of validation NORMAL scores (target FPR 5\%). Rankings largely survive the shift (Table~\ref{tab:main}), but test FPR far exceeds its validation value. Tier~3 averages 3 seeds.}
+\label{tab:tau-transfer}
+\end{table}

@@ -1,0 +1,418 @@
+{
+  "tier1_aspect_ratio_probe": {
+    "n_seeds": 1,
+    "name": "tier1_aspect_ratio_probe",
+    "tier": 1,
+    "description": "Shortcut probe: 3-sigma rule on original width/height; not a clinical feature",
+    "feature": "aspect_ratio",
+    "score": "abs(x - mu) / sigma",
+    "normal_mean": 1.2262054972537022,
+    "normal_std": 0.13002564022352658,
+    "fit_images": 1214,
+    "fixed_threshold": 3.0,
+    "train_seconds": 0.0005496430676430464,
+    "inference_ms_per_image": 8.016581394785348
+  },
+  "tier1_constant": {
+    "n_seeds": 1,
+    "name": "tier1_constant",
+    "tier": 1,
+    "description": "Constant score; fixed tau gives always-normal",
+    "fixed_threshold": 0.0,
+    "train_seconds": 0.0,
+    "inference_ms_per_image": 0.0
+  },
+  "tier1_edge_3sigma": {
+    "n_seeds": 1,
+    "name": "tier1_edge_3sigma",
+    "tier": 1,
+    "description": "3-sigma rule on mean edge strength; mu/sigma fitted on train/NORMAL only",
+    "feature": "edge_strength",
+    "score": "abs(x - mu) / sigma",
+    "normal_mean": 0.016847723364658174,
+    "normal_std": 0.0019876975558549784,
+    "fit_images": 1214,
+    "fixed_threshold": 3.0,
+    "train_seconds": 0.0006712919566780329,
+    "inference_ms_per_image": 8.016581394785348
+  },
+  "tier1_random": {
+    "n_seeds": 3,
+    "name": "tier1_random",
+    "tier": 1,
+    "description": "Uniform random score independent of the image",
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "train_seconds": 0.0,
+    "inference_ms_per_image": 0.0
+  },
+  "tier2_knn": {
+    "n_seeds": 1,
+    "name": "tier2_knn",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 4.477036124677318,
+    "inference_ms_per_image": 3.8774677711365295,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_bank90": {
+    "n_seeds": 3,
+    "name": "tier2_knn_bank90",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 0.9,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1093,
+        "pneumonia": 0
+      },
+      {
+        "seed": 1,
+        "normal": 1093,
+        "pneumonia": 0
+      },
+      {
+        "seed": 2,
+        "normal": 1093,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 4.329727534473057,
+    "inference_ms_per_image": 3.9481101602307724,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_contam01": {
+    "n_seeds": 3,
+    "name": "tier2_knn_contam01",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.01,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 12
+      },
+      {
+        "seed": 1,
+        "normal": 1214,
+        "pneumonia": 12
+      },
+      {
+        "seed": 2,
+        "normal": 1214,
+        "pneumonia": 12
+      }
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 4.7829348072020785,
+    "inference_ms_per_image": 3.9544349232019465,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_contam05": {
+    "n_seeds": 3,
+    "name": "tier2_knn_contam05",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.05,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 64
+      },
+      {
+        "seed": 1,
+        "normal": 1214,
+        "pneumonia": 64
+      },
+      {
+        "seed": 2,
+        "normal": 1214,
+        "pneumonia": 64
+      }
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 4.785743992659184,
+    "inference_ms_per_image": 3.956881948861446,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_contam10": {
+    "n_seeds": 3,
+    "name": "tier2_knn_contam10",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.1,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 135
+      },
+      {
+        "seed": 1,
+        "normal": 1214,
+        "pneumonia": 135
+      },
+      {
+        "seed": 2,
+        "normal": 1214,
+        "pneumonia": 135
+      }
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 4.764883707005762,
+    "inference_ms_per_image": 3.938710968327106,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_crop": {
+    "n_seeds": 1,
+    "name": "tier2_knn_crop",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "crop",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": null,
+    "train_seconds": 2.767845986205817,
+    "inference_ms_per_image": 2.339010160135311,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_region_center8": {
+    "n_seeds": 1,
+    "name": "tier2_knn_region_center8",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3_center8",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 2.86086710426868,
+    "inference_ms_per_image": 2.3957413547458484,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_region_notop3": {
+    "n_seeds": 1,
+    "name": "tier2_knn_region_notop3",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3_notop3",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 2.8610672482839328,
+    "inference_ms_per_image": 2.437310835645479,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_knn_region_ring2": {
+    "n_seeds": 1,
+    "name": "tier2_knn_region_ring2",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "knn",
+    "layer": "block3_ring2",
+    "normalize": "l2",
+    "k": 2,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 2.860919661129872,
+    "inference_ms_per_image": 2.4060630969713257,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier2_mahalanobis": {
+    "n_seeds": 1,
+    "name": "tier2_mahalanobis",
+    "tier": 2,
+    "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+    "scorer": "mahalanobis",
+    "layer": "block3",
+    "normalize": "l2",
+    "k": null,
+    "preprocessing": "full_frame",
+    "contamination": 0.0,
+    "bank_fraction": 1.0,
+    "bank_sizes": [
+      {
+        "seed": 0,
+        "normal": 1214,
+        "pneumonia": 0
+      }
+    ],
+    "seeds": [
+      0
+    ],
+    "selection": "results/tier2/selected_config_full_frame.json",
+    "train_seconds": 25.72059582138892,
+    "inference_ms_per_image": 5.232589116947433,
+    "feature_gpu": "NVIDIA GeForce RTX 3090"
+  },
+  "tier3_densenet121": {
+    "n_seeds": 3,
+    "name": "tier3_densenet121",
+    "tier": 3,
+    "description": "Supervised DenseNet121 fine-tuning (ImageNet init); score = logit difference",
+    "source": "https://github.com/yenkuliu/pneumonia-classification (MIT License, Yen Ku Liu)",
+    "score": "logit_PNEUMONIA - logit_NORMAL",
+    "fixed_threshold": 0.0,
+    "config": {
+      "image_size": 256,
+      "preprocessing": "full_frame",
+      "batch_size": 16,
+      "epochs": 20,
+      "warmup_epochs": 2,
+      "early_stopping_patience": 5,
+      "backbone_lr": 1e-05,
+      "head_lr": 0.0005,
+      "weight_decay": 0.0005,
+      "dropout": 0.25,
+      "normal_class_weight": 1.5,
+      "pneumonia_class_weight": 1.0,
+      "horizontal_flip_p": 0.5,
+      "rotation_degrees": 10.0,
+      "color_jitter": 0.12,
+      "freeze_batchnorm": true,
+      "selection_metric": "val_balanced_accuracy"
+    },
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "best_epochs": [
+      11,
+      16,
+      3
+    ],
+    "train_seconds": 613.0339342299849,
+    "inference_ms_per_image": 4.3692452559181945,
+    "environment": {
+      "python": "3.11.18",
+      "torch": "2.14.1+cu126",
+      "torchvision": "0.29.1+cu126",
+      "cuda": "12.6",
+      "gpu": "NVIDIA GeForce RTX 3090",
+      "workers": 8
+    }
+  }
+}

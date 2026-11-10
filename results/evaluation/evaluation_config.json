@@ -1,0 +1,26 @@
+{
+  "methods": [
+    "tier1_aspect_ratio_probe",
+    "tier1_constant",
+    "tier1_edge_3sigma",
+    "tier1_random",
+    "tier2_knn",
+    "tier2_knn_bank90",
+    "tier2_knn_contam01",
+    "tier2_knn_contam05",
+    "tier2_knn_contam10",
+    "tier2_knn_crop",
+    "tier2_knn_region_center8",
+    "tier2_knn_region_notop3",
+    "tier2_knn_region_ring2",
+    "tier2_mahalanobis",
+    "tier3_densenet121"
+  ],
+  "reference": "tier2_knn",
+  "bootstrap": 2000,
+  "bootstrap_seed": 0,
+  "normal_quantile": 0.95,
+  "target_sensitivity": 0.95,
+  "deployment_prevalence": 0.05,
+  "decision_rule": "alert if s(x) > tau"
+}

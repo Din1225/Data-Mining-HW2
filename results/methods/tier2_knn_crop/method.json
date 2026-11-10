@@ -1,0 +1,26 @@
+{
+  "name": "tier2_knn_crop",
+  "tier": 2,
+  "description": "One-class scoring on frozen ImageNet DenseNet121 features; bank = train/NORMAL",
+  "scorer": "knn",
+  "layer": "block3",
+  "normalize": "l2",
+  "k": 2,
+  "preprocessing": "crop",
+  "contamination": 0.0,
+  "bank_fraction": 1.0,
+  "bank_sizes": [
+    {
+      "seed": 0,
+      "normal": 1214,
+      "pneumonia": 0
+    }
+  ],
+  "seeds": [
+    0
+  ],
+  "selection": null,
+  "train_seconds": 2.767845986205817,
+  "inference_ms_per_image": 2.339010160135311,
+  "feature_gpu": "NVIDIA GeForce RTX 3090"
+}
