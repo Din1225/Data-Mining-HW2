@@ -84,7 +84,7 @@ python3.14 -m venv .venv-analysis
 由於資料內含大量影像，並沒上傳至此 repo，需自行執行 `src/download_pneumonia.py` 進行資料集下載，並由 `src/data_split.py` 重新產生切分。
 
 
-統計分析沿用 `data/chest_xray/re-split/manifest.csv` 與既有 scores。首次使用完整 Kaggle v2 archive 時，可在分析指令加上 `--archive data/chest_xray/kaggle-v2.zip`，由分析程式沿用既有 splitter 建立切分。
+統計分析讀取 `data/chest_xray/re-split/manifest.csv` 與 `results/methods/` 中的 val/test scores。
 
 
 ## 主要程式
