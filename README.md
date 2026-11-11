@@ -13,6 +13,7 @@ HW2/
 │   ├── DataSplit_LeakagePrevention.md
 │   ├── TaskDefinition_Labels_ClassImbalance.md
 │   ├── Exploratory_Feature_Analysis.md
+│   ├── Statistical_Error_Analysis.md   # 統計顯著性、錯誤案例與分析限制
 │   └── MainExperiments_Summary.md      # 主實驗總覽（給組員）
 ├── results/
 │   ├── features/                       # 所有 split 的影像特徵快取（Tier 1 使用）
@@ -21,6 +22,7 @@ HW2/
 │   │       ├── scores_seed<k>.csv      # path, split, label, score
 │   │       └── method.json             # 方法參數、fixed τ、訓練時間與推論延遲
 │   ├── evaluation/                     # 共用評估輸出：summary、per-seed、paired bootstrap
+│   ├── statistics/                     # Cluster bootstrap、案例查證、圖與來源紀錄
 │   ├── tier2/                          # Tier 2 只用 val 的設定選擇（layer、normalize、k）
 │   ├── ablations/k_contamination/      # k × contamination 交叉 ablation（分析用，不回頭改主方法）
 │   ├── analysis/                       # §8 error analysis：案例、FP vs TN、train/test 偏移與圖
@@ -48,9 +50,12 @@ HW2/
 │   ├── evaluation.py
 │   ├── error_analysis.py
 │   ├── tier2_heatmap.py
+│   ├── statistical_analysis.py         # 配對統計與錯誤案例核對
 │   └── export_latex.py
 ├── paper/                              # 論文素材：自動產生的 LaTeX 表格、pipeline 圖、數字 macro 與圖檔（見 paper/README.md）
 ├── requirements.txt                      # 所需套件
+├── requirements-analysis.txt           # 統計核對環境套件
+├── tests/test_statistical_analysis.py   # 指標、群組重抽與 ID 配對測試
 └── README.md                           # 專案與執行說明
 ```
 
@@ -64,9 +69,22 @@ python -m pip install -r requirements.txt
 ```
 
 
+## 統計分析環境（venv）
+
+統計核對可獨立使用 Python 3.14 venv，不需要 Conda 或 CUDA：
+
+```bash
+python3.14 -m venv .venv-analysis
+.venv-analysis/bin/python -m pip install -r requirements-analysis.txt
+```
+
+
 ## 下載資料集與資料切分
 
 由於資料內含大量影像，並沒上傳至此 repo，需自行執行 `src/download_pneumonia.py` 進行資料集下載，並由 `src/data_split.py` 重新產生切分。
+
+
+統計分析沿用 `data/chest_xray/re-split/manifest.csv` 與既有 scores。首次使用完整 Kaggle v2 archive 時，可在分析指令加上 `--archive data/chest_xray/kaggle-v2.zip`，由分析程式沿用既有 splitter 建立切分。
 
 
 ## 主要程式
@@ -85,6 +103,7 @@ python -m pip install -r requirements.txt
 | `src/tier2_heatmap.py` | Tier 2 可解釋性：以 block3 patch 特徵對 train/NORMAL patch bank 做最近鄰，畫出 anomaly heatmap，並統計高熱 patch 落在上緣、外圈與中央肺野的比例（需要 GPU） |
 | `src/export_latex.py` | 由 `results/` 自動產生論文用的 LaTeX 表格、TikZ pipeline 圖與數字 macro，輸出到 `paper/` |
 | `src/evaluation.py` | 所有 tiers 共用的評估：驗證分數檔與 manifest 一致，計算 ROC-AUC、PR-AUC、Sens@Spec95、Spec@Sens95；只用 val 選 τ（normal_percentile、best_f1、sensitivity_target、fixed），並以 stratified／paired bootstrap 估計 95% CI 與 p 值 |
+| `src/statistical_analysis.py` | 核對資料、逐筆 scores、指標與案例，執行 paired cluster bootstrap／Holm，結果獨立輸出至 `results/statistics/` |
 
 
 ## 評估流程
@@ -120,33 +139,23 @@ python src/export_latex.py
 - Test 只用於最終指標。PPV 與每千張警示數依 `--deployment-prevalence`（預設 5%）由 test 的 sensitivity/specificity 換算。
 
 
+### 統計顯著性與錯誤案例查證
+
+使用已保存的 val/test scores，無須重跑上述模型訓練：
+
+```bash
+.venv-analysis/bin/python src/statistical_analysis.py
+.venv-analysis/bin/python -m unittest discover -s tests -v
+```
+
+預設 bootstrap 5000 次、seed 42。`results/statistics/` 包含方法差距與 CI、operating points、案例查證、cluster IDs、圖及輸入 SHA-256。方法、結果與推論限制見 [統計顯著性與錯誤案例分析](doc/Statistical_Error_Analysis.md)。
+
+
 ## 文件
 
 - `doc/DataSplit_LeakagePrevention.md`：資料來源、重新切分原因、固定切分方法與 leakage-prevention protocol。
 - `doc/TaskDefinition_Labels_ClassImbalance.md`：normal/anomaly 定義、樣本與標籤規格、feature dimension、class imbalance 及評估限制。
 - `doc/Exploratory_Feature_Analysis.md`：training-only distribution contrast、feature separability、feature association、冗餘檢查與後續實驗假設。
+- `doc/Statistical_Error_Analysis.md`：統計方法與結果、資料核對、錯誤案例、推論限制與重現方式。
 - `doc/MainExperiments_Summary.md`：主實驗（Tier 1–3、ablation、錯誤分析、heatmap）的總覽、結果、評分表對照與待辦事項。
 
-
-## 統計顯著性與錯誤案例分析
-
-[分析文件](doc/Statistical_Error_Analysis.md) 說明配對比較、cluster bootstrap、Holm 校正、六個錯誤案例的查證及推論限制。分析直接使用既有 val/test scores，結果獨立存於 `results/statistics/`。
-
-| 路徑 | 內容 |
-|---|---|
-| `src/statistical_analysis.py` | 資料與指標核對、paired cluster bootstrap、案例查證 |
-| `results/statistics/` | 方法差距與 CI、operating points、案例、cluster IDs、圖與來源紀錄 |
-| `doc/Statistical_Error_Analysis.md` | 統計方法、結果、錯誤案例與分析限制 |
-| `requirements-analysis.txt` | 分析環境套件版本 |
-| `tests/test_statistical_analysis.py` | 指標計算、群組重抽與 ID 配對測試 |
-
-在 repo 根目錄以 venv 執行，不需要 Conda 或 CUDA：
-
-```bash
-python3.14 -m venv .venv-analysis
-.venv-analysis/bin/python -m pip install -r requirements-analysis.txt
-.venv-analysis/bin/python src/statistical_analysis.py
-.venv-analysis/bin/python -m unittest discover -s tests -v
-```
-
-資料沿用 `data/chest_xray/re-split/manifest.csv`。首次使用完整 Kaggle v2 archive 時，可加上 `--archive data/chest_xray/kaggle-v2.zip`，由分析程式沿用既有 splitter 建立切分。預設 bootstrap 為 5000 次、seed 42；套件版本及輸入 SHA-256 記錄於 `results/statistics/verification.json`。
