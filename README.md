@@ -127,3 +127,26 @@ python src/export_latex.py
 - `doc/Exploratory_Feature_Analysis.md`：training-only distribution contrast、feature separability、feature association、冗餘檢查與後續實驗假設。
 - `doc/MainExperiments_Summary.md`：主實驗（Tier 1–3、ablation、錯誤分析、heatmap）的總覽、結果、評分表對照與待辦事項。
 
+
+## 統計顯著性與錯誤案例分析
+
+[分析文件](doc/Statistical_Error_Analysis.md) 說明配對比較、cluster bootstrap、Holm 校正、六個錯誤案例的查證及推論限制。分析直接使用既有 val/test scores，結果獨立存於 `results/statistics/`。
+
+| 路徑 | 內容 |
+|---|---|
+| `src/statistical_analysis.py` | 資料與指標核對、paired cluster bootstrap、案例查證 |
+| `results/statistics/` | 方法差距與 CI、operating points、案例、cluster IDs、圖與來源紀錄 |
+| `doc/Statistical_Error_Analysis.md` | 統計方法、結果、錯誤案例與分析限制 |
+| `requirements-analysis.txt` | 分析環境套件版本 |
+| `tests/test_statistical_analysis.py` | 指標計算、群組重抽與 ID 配對測試 |
+
+在 repo 根目錄以 venv 執行，不需要 Conda 或 CUDA：
+
+```bash
+python3.14 -m venv .venv-analysis
+.venv-analysis/bin/python -m pip install -r requirements-analysis.txt
+.venv-analysis/bin/python src/statistical_analysis.py
+.venv-analysis/bin/python -m unittest discover -s tests -v
+```
+
+資料沿用 `data/chest_xray/re-split/manifest.csv`。首次使用完整 Kaggle v2 archive 時，可加上 `--archive data/chest_xray/kaggle-v2.zip`，由分析程式沿用既有 splitter 建立切分。預設 bootstrap 為 5000 次、seed 42；套件版本及輸入 SHA-256 記錄於 `results/statistics/verification.json`。
