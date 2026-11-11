@@ -71,12 +71,23 @@ Tier 2 的 ROC-AUC 為 0.877，優於 Tier 1 的 0.813；此差距衡量排序�
 
 Tier 2 主方法僅有一個固定 bank 的 run；bank90 的三個 seeds 改變了 bank，不能用來估計完整主方法的 training variability。bootstrap CI 亦不等於多次獨立訓練。Tier 3 原 recipe 是否曾參考同一官方 test 調整，缺乏足夠紀錄，可能影響 generalization 的解讀。
 
-主表各方法自身的 CI 沿用 `results/evaluation/` 的 2,000 次 image-level bootstrap；方法間 gap 與 ablation 使用 `results/statistics/` 的 5,000 次 cluster bootstrap。`src/export_latex.py` 依此匯出主表與 ablation，caption 區分兩種 CI。套件需求及執行指令見 [README](../README.md)。
+既有 `results/evaluation/` 與 `paper/` 使用組員原始 image-level bootstrap。補充的 5,000 次 cluster bootstrap 獨立存於 `results/statistics/`，沒有併入或覆寫組員的表格。兩者使用不同的重抽單位與多重比較處理。
+
+在 repo 根目錄執行統計核對：
+
+```bash
+python3.14 -m venv .venv-analysis
+.venv-analysis/bin/python -m pip install -r requirements-analysis.txt
+.venv-analysis/bin/python src/statistical_analysis.py
+.venv-analysis/bin/python -m unittest discover -s tests -v
+```
+
+資料須存在 `data/chest_xray/re-split/` 並包含 manifest。首次使用 Kaggle v2 archive 時，可加上 `--archive data/chest_xray/kaggle-v2.zip`，由分析程式沿用既有 splitter 建立資料切分。套件版本及輸入檔案 SHA-256 見 `results/statistics/verification.json`。
 
 ## 7. Contributions 與 AI 使用
 
 - **Ding-Xiang Lin**：資料統計、切分、前處理與 feature analysis。
 - **Tien-Chia Chang**：主實驗、ablation、共用評估、初版 bootstrap／錯誤案例、heatmap 與論文素材。
-- **Chao Hsiao**：原始資料與 scores 核對、paired cluster bootstrap／Holm、既有案例重現與查證、分析限制及表格匯出更新。
+- **Chao Hsiao**：原始資料與 scores 核對、paired cluster bootstrap／Holm、既有案例重現與查證、統計結果與分析文件。
 
 既有主實驗文件記載 Claude Code 協助撰寫程式。補充分析使用 OpenAI Codex 協助方法草擬、程式與測試撰寫、執行核對及文字整理，包括 cluster bootstrap 設計；模型與原始 scores 沿用組員實驗。團隊對採用的方法與結果解讀負責。

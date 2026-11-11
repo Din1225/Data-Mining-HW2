@@ -13,8 +13,7 @@ HW2/
 │   ├── DataSplit_LeakagePrevention.md
 │   ├── TaskDefinition_Labels_ClassImbalance.md
 │   ├── Exploratory_Feature_Analysis.md
-│   ├── MainExperiments_Summary.md      # 主實驗流程、結果與限制
-│   └── Statistical_Error_Analysis.md   # 統計顯著性、案例查證與分析限制
+│   └── MainExperiments_Summary.md      # 主實驗總覽（給組員）
 ├── results/
 │   ├── features/                       # 所有 split 的影像特徵快取（Tier 1 使用）
 │   ├── methods/                        # 各方法的 val/test 分數檔，一個方法一個資料夾
@@ -22,7 +21,6 @@ HW2/
 │   │       ├── scores_seed<k>.csv      # path, split, label, score
 │   │       └── method.json             # 方法參數、fixed τ、訓練時間與推論延遲
 │   ├── evaluation/                     # 共用評估輸出：summary、per-seed、paired bootstrap
-│   ├── statistics/                     # 配對 cluster gap、案例查證、群組及 SHA-256 紀錄
 │   ├── tier2/                          # Tier 2 只用 val 的設定選擇（layer、normalize、k）
 │   ├── ablations/k_contamination/      # k × contamination 交叉 ablation（分析用，不回頭改主方法）
 │   ├── analysis/                       # §8 error analysis：案例、FP vs TN、train/test 偏移與圖
@@ -50,43 +48,25 @@ HW2/
 │   ├── evaluation.py
 │   ├── error_analysis.py
 │   ├── tier2_heatmap.py
-│   ├── statistical_analysis.py
 │   └── export_latex.py
 ├── paper/                              # 論文素材：自動產生的 LaTeX 表格、pipeline 圖、數字 macro 與圖檔（見 paper/README.md）
 ├── requirements.txt                      # 所需套件
-├── requirements-analysis.txt            # 不訓練模型的統計核對環境
-├── tests/test_statistical_analysis.py    # 指標、群組重抽與 ID 配對測試
 └── README.md                           # 專案與執行說明
 ```
 
 
-## 建立分析環境（不用 Conda）
+## 建立 Conda 執行環境
 
 ```bash
-python3.14 -m venv .venv-analysis
-source .venv-analysis/bin/activate
-python -m pip install -r requirements-analysis.txt
+conda create --name dm_hw2 python=3.11 pip -y
+conda activate dm_hw2
+python -m pip install -r requirements.txt
 ```
 
-統計分析環境為 macOS、Python 3.14，不執行模型訓練。組員原主實驗的環境為 Python 3.11、PyTorch 2.14.1+cu126、torchvision 0.29.1+cu126、RTX 3090；原 `requirements.txt` 不含 PyTorch／torchvision。若要重跑 CUDA 訓練，需另外建立相容的 GPU 環境並裝這些依賴；此分析環境不包含 CUDA 訓練依賴。
 
 ## 下載資料集與資料切分
 
-影像未上傳至 repo。分析使用 Kaggle **version 2**；首次下載後，`statistical_analysis.py --archive` 只抽出一份正式 train/val/test，沿用組員 `data_split.py` 的 seed 42 建立 manifest。保留 archive 與原始影像，不刪除／覆寫已有資料；已有 manifest 時直接沿用並查核 IDs。
-
-```bash
-# 首次下載；中斷時可用相同指令續傳。archive 約 2.46 GB。
-mkdir -p data/chest_xray
-curl -L --fail --retry 2 -C - -o data/chest_xray/kaggle-v2.zip \
-  'https://www.kaggle.com/api/v1/datasets/download/paultimothymooney/chest-xray-pneumonia?datasetVersionNumber=2'
-
-# 已有完整 archive 時由這裡開始，不需要再次下載。
-python src/statistical_analysis.py --archive data/chest_xray/kaggle-v2.zip
-python -m unittest discover -s tests -v
-python src/export_latex.py
-```
-
-之後只需 `python src/statistical_analysis.py` 即可重建 `results/statistics/`；預設 bootstrap 5000、seed 42。這會使用既有分數，不呼叫模型訓練。原 `download_pneumonia.py` 仍保留供組員工作流程使用，但會取得 latest 並清理下載暫存。
+由於資料內含大量影像，並沒上傳至此 repo，需自行執行 `src/download_pneumonia.py` 進行資料集下載，並由 `src/data_split.py` 重新產生切分。
 
 
 ## 主要程式
@@ -105,12 +85,9 @@ python src/export_latex.py
 | `src/tier2_heatmap.py` | Tier 2 可解釋性：以 block3 patch 特徵對 train/NORMAL patch bank 做最近鄰，畫出 anomaly heatmap，並統計高熱 patch 落在上緣、外圈與中央肺野的比例（需要 GPU） |
 | `src/export_latex.py` | 由 `results/` 自動產生論文用的 LaTeX 表格、TikZ pipeline 圖與數字 macro，輸出到 `paper/` |
 | `src/evaluation.py` | 所有 tiers 共用的評估：驗證分數檔與 manifest 一致，計算 ROC-AUC、PR-AUC、Sens@Spec95、Spec@Sens95；只用 val 選 τ（normal_percentile、best_f1、sensitivity_target、fixed），並以 stratified／paired bootstrap 估計 95% CI 與 p 值 |
-| `src/statistical_analysis.py` | 核對資料、所有 per-seed 指標與既有案例；補充 label-stratified paired cluster bootstrap、Holm、固定 τ 的情境數字及案例原始特徵／SHA-256 查證，不重訓或選模型 |
 
 
 ## 評估流程
-
-以下為模型實驗流程；統計核對使用上節指令。`results/evaluation/` 是原始 image-level bootstrap；`results/statistics/` 是 cluster bootstrap 補充。匯出表格前執行統計分析，匯出程式會用新 cluster gap CI／Holm p 更新主表與 ablation；主表個別方法的 CI 仍保留原 image-level 定義並註明。
 
 每個方法把 val/test 的 anomaly score（越高越異常）寫到 `results/methods/<method>/scores_seed<k>.csv`，判定規則為 $s(x) > \tau$。所有方法都以同一個 `evaluation.py` 評估：
 
@@ -148,6 +125,5 @@ python src/export_latex.py
 - `doc/DataSplit_LeakagePrevention.md`：資料來源、重新切分原因、固定切分方法與 leakage-prevention protocol。
 - `doc/TaskDefinition_Labels_ClassImbalance.md`：normal/anomaly 定義、樣本與標籤規格、feature dimension、class imbalance 及評估限制。
 - `doc/Exploratory_Feature_Analysis.md`：training-only distribution contrast、feature separability、feature association、冗餘檢查與後續實驗假設。
-- `doc/MainExperiments_Summary.md`：主實驗（Tier 1–3、ablation、錯誤分析、heatmap）的流程、結果與分析限制。
-- `doc/Statistical_Error_Analysis.md`：統計方法與結果、資料核對、錯誤案例、分析限制、貢獻與 AI 使用揭露。
+- `doc/MainExperiments_Summary.md`：主實驗（Tier 1–3、ablation、錯誤分析、heatmap）的總覽、結果、評分表對照與待辦事項。
 
