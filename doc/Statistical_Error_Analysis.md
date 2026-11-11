@@ -22,9 +22,9 @@ Tier 1–3 和 ablation 的 scores 均沿用既有實驗。資料核對重建 ra
 
 採 **label-stratified paired cluster bootstrap**：每個 label 分別有放回抽完整群組，所有方法共用同一組重抽權重；保留群組內所有影像，計算 image-weighted 指標。重抽 5,000 次，seed 42。群組大小不等，因此各次影像數與陽性比例可能略變；估計目標為 image-weighted 指標。方法背景可參考 [Field & Welsh (2007)](https://doi.org/10.1111/j.1467-9868.2007.00593.x)；配對重抽的概念見 [SciPy bootstrap 文件](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html)。本程式用 multiplicity weights 計算，已與明確展開重抽樣本後的 sklearn AUC/AP 核對。
 
-效果量為 `metric(method) - metric(reference)`，ROC-AUC 和 PR-AUC 均無單位；PR-AUC 沿用組員的 **average precision** 定義。差距的 95% CI 用 percentile bootstrap。虛無假設為指標差距 0；沿用組員的雙尾 bootstrap tail approximation：`min(1, 2*(min(nΔ≤0,nΔ≥0)+1)/(B+1))`，它不是 exact permutation p，也不是獨立 seed t-test。最小可報 raw p 為 2/5001，不能報 p=0。
+效果量為 `metric(method) - metric(reference)`，ROC-AUC 和 PR-AUC 均無單位；PR-AUC 沿用組員的 **average precision** 定義。差距的 95% CI 用 percentile bootstrap。虛無假設為指標差距 0；沿用組員的雙尾 bootstrap tail approximation：`min(1, 2*(min(nΔ≤0,nΔ≥0)+1)/(B+1))`，此 p 為 bootstrap 近似值，有別於 exact permutation test 或獨立 seed t-test。此設定的最小 raw p 為 2/5001。
 
-主要報告兩個 ROC-AUC 比較，Holm family 大小 2；兩個 secondary AP 比較另成一個 family；九個 ablations × ROC-AUC/AP 共 18 個探索性比較另作 Holm。CI 是各比較的 marginal 95% CI，沒有作 simultaneous coverage 校正。所有比較分類都是看到組員現有結果後整理，**不是預先登錄的 confirmatory analysis**；Holm 也不能消除事後選擇偏差。
+主要報告兩個 ROC-AUC 比較，Holm family 大小 2；兩個 secondary AP 比較另成一個 family；九個 ablations × ROC-AUC/AP 共 18 個探索性比較另作 Holm。CI 是各比較的 marginal 95% CI，沒有作 simultaneous coverage 校正。比較分類依現有結果事後整理，未預先登錄；Holm 不消除事後選擇偏差。
 
 | 比較 | 指標 | Δ | cluster 95% CI | Holm p |
 |---|---|---:|---|---:|
@@ -35,17 +35,17 @@ Tier 1–3 和 ablation 的 scores 均沿用既有實驗。資料核對重建 ra
 
 ![Paired cluster metric differences](../results/statistics/paired_cluster_gaps.png)
 
-Tier 2 的 ROC-AUC 為 0.877，優於 Tier 1 的 0.813；這是排序能力的差異，不是 accuracy 增加 6.5%。AP 的 CI 跨 0，只能說目前未檢出差異，不能證明兩方法等效。Tier 3 的 ROC-AUC 為 0.974，優於 Tier 2；然而它同時改變了 supervision、fine-tuning、training objective 與資料使用，差距不能全歸因於「肺炎標籤的因果效果」。Tier 2 fitting 只用 NORMAL，但 model selection／τ 使用帶標籤 val，不能寫成「完全沒用過肺炎標籤」。
+Tier 2 的 ROC-AUC 為 0.877，優於 Tier 1 的 0.813；此差距衡量排序能力，不等同 accuracy 差距。AP 的 CI 跨 0，目前未檢出差異；兩方法的等效性未經驗證。Tier 3 的 ROC-AUC 為 0.974，優於 Tier 2；然而它同時改變了 supervision、fine-tuning、training objective 與資料使用，差距不能全歸因於「肺炎標籤的因果效果」。Tier 2 fitting 只用 NORMAL，但 model selection／τ 使用帶標籤 val，因此方法在 selection 階段仍使用肺炎標籤。
 
-完整數字在 [`paired_cluster_gaps.csv`](../results/statistics/paired_cluster_gaps.csv)。污染 1%／5%／10% 的 ROC-AUC 下降分別為 0.017／0.108／0.163，三者 Holm p 約 .007，支持此設定對污染敏感。Mahalanobis、crop、bank90 未檢出差距，不代表等效。中央 12×12 pooling 的 ΔROC-AUC +0.029，Holm p 約 .010；中央 8×8 的 p 約 .548，其 CI 已跨 0。這些 pooling 設計在看完 test 後提出，僅是探索性診斷，主方法仍為 full-frame kNN；需要新資料驗證，不能改選主模型。
+完整數字在 [`paired_cluster_gaps.csv`](../results/statistics/paired_cluster_gaps.csv)。污染 1%／5%／10% 的 ROC-AUC 下降分別為 0.017／0.108／0.163，三者 Holm p 約 .007，支持此設定對污染敏感。Mahalanobis、crop、bank90 未檢出差距，不代表等效。中央 12×12 pooling 的 ΔROC-AUC +0.029，Holm p 約 .010；中央 8×8 的 p 約 .548，其 CI 已跨 0。這些 pooling 設計在看完 test 後提出，僅是探索性診斷，主方法仍為 full-frame kNN；尚需新資料驗證。
 
-**不確定性的邊界**：CI 條件於固定的 split、訓練資料、已擬合模型、現有 seeds、val 所選設定／τ。沒有重新抽訓練集、seeds 或 val；因此不涵蓋完整 training／selection variability。三個 seeds 共用 test，不是三份獨立 test；沒有使用重疊 CV folds 做 t-test。cluster 仍是檔名代理；真實病人、醫院等相依性若未被捕捉，CI 仍可能偏窄。cluster bootstrap 未必涵蓋所有相依性。
+**不確定性的邊界**：CI 條件於固定的 split、訓練資料、已擬合模型、現有 seeds、val 所選設定／τ。沒有重新抽訓練集、seeds 或 val；因此不涵蓋完整 training／selection variability。三個 seeds 共用 test，不是三份獨立 test。cluster 仍是檔名代理；真實病人、醫院等相依性若未被捕捉，CI 仍可能偏窄。cluster bootstrap 未必涵蓋所有相依性。
 
 ## 4. 錯誤案例與解釋（§8）
 
-固定主方法 `tier2_knn/seed0`，沿用 `s(x)>tau`；`tau=0.11775001744652441` 只由 val sensitivity ≥95% 選出。test 為 **TP 379、FP 141、TN 93、FN 11**。Sensitivity 的分母是 390；specificity 的分母是 234；不是把 624 當兩者共同分母。
+固定主方法 `tier2_knn/seed0`，沿用 `s(x)>tau`；`tau=0.11775001744652441` 只由 val sensitivity ≥95% 選出。test 為 **TP 379、FP 141、TN 93、FN 11**。Sensitivity 與 specificity 的分母分別為 390 與 234。
 
-選例規則沿用 Charlie：FP 依 `score−tau` 由大至小取 2 筆，另取最接近門檻 1 筆；FN 依 margin 由小至大取 2 筆，另取最接近門檻 1 筆；去除重複。path 已排序，同 margin 的順序亦固定。這是完整 error set 上可重現的選例，不是隨意挑圖。六筆的 actual、prediction、error、score、tau、margin、原始尺寸與 SHA-256 見 [`case_checks.csv`](../results/statistics/case_checks.csv)。其中 `error=prediction−actual`：+1 為 FP、−1 為 FN；不是回歸 residual，也不是錯誤程度的連續量。
+選例規則沿用 Charlie：FP 依 `score−tau` 由大至小取 2 筆，另取最接近門檻 1 筆；FN 依 margin 由小至大取 2 筆，另取最接近門檻 1 筆；去除重複。path 已排序，同 margin 的順序亦固定。選例涵蓋完整 error set，依固定規則重現。六筆的 actual、prediction、error、score、tau、margin、原始尺寸與 SHA-256 見 [`case_checks.csv`](../results/statistics/case_checks.csv)。其中 `error=prediction−actual`：+1 為 FP、−1 為 FN。error 表示分類錯誤的方向，margin 則表示 score 與 τ 的距離。
 
 ![既有六個案例與最近的 NORMAL 鄰居](../results/analysis/tier2_knn_seed0_sensitivity_target/case_gallery.png)
 
@@ -53,7 +53,7 @@ Tier 2 的 ROC-AUC 為 0.877，優於 Tier 1 的 0.813；這是排序能力的�
 
 - **`test/NORMAL/NORMAL2-IM-0098-0001.jpeg`**：actual 0、prediction 1、error +1；score 0.212338、margin +0.094588；1266×1044，aspect ratio 1.213、edge strength 0.01451。實際圖像可見明顯黑邊，score 離門檻很遠。這支持「取景／邊界差異可能被視為異常」的候選解釋；沒有遮罩干預，不能斷言黑邊造成 FP。原有 heatmap 此圖的高熱 patch 49% 在 top、0% 在 center，提供一致的輔助線索。
 - **`test/NORMAL/IM-0022-0001.jpeg`**：actual 0、prediction 1、error +1；score 0.206270、margin +0.088520；1300×617，aspect ratio 2.107、edge strength 0.01095。原始圖像呈寬扁取景；拉成 256×256 可能改變幾何外觀。候選解釋是取景與表示的 shift，但單一案例不能確定模型利用哪個特徵。crop ablation 未檢出整體改善，也不等於已排除所有幾何影響。
-- **`test/PNEUMONIA/person63_virus_121.jpeg`**：actual 1、prediction 0、error −1；score 0.108515、margin −0.009235；1504×1032，aspect ratio 1.457、edge strength 0.01483。是六筆中 score 最低的 FN；與正常 bank 的表示接近是可能盲點，但不能僅靠圖像推定病灶輕微、誤標或病因。11 個 FN 都落在門檻下方 0.01 內；這個 near-miss 範圍是看完結果的描述，不能用來事後降低 τ。
+- **`test/PNEUMONIA/person63_virus_121.jpeg`**：actual 1、prediction 0、error −1；score 0.108515、margin −0.009235；1504×1032，aspect ratio 1.457、edge strength 0.01483。是六筆中 score 最低的 FN；與正常 bank 的表示接近是可能盲點，但不能僅靠圖像推定病灶輕微、誤標或病因。11 個 FN 都落在門檻下方 0.01 內；near-miss 範圍是事後描述，τ 維持 val 所選值。
 
 共同盲點候選為：全域凍結表示同時包含疾病及取景訊號，異常分布和正常 bank 重疊，遇到 NORMAL 的取景 shift 容易誤報。先嘗試固定幾何 pooling／控制拍攝條件，是針對此候選機制的合理下一步；組員已做事後 pooling 實驗，主方法仍維持原設定。
 
@@ -65,7 +65,7 @@ Tier 2 的 ROC-AUC 為 0.877，優於 Tier 1 的 0.813；這是排序能力的�
 
 公式：`false alerts=1000*(1−π)*(1−specificity)`；`misses=1000*π*(1−sensitivity)`；`PPV=π*sensitivity / [π*sensitivity+(1−π)*(1−specificity)]`。Tier 1 約 735 次誤報，Tier 2 少約 162 次；差值先以未取整數的數字計算。上述數字反映假設情境下的人工覆核負擔，不構成部署驗證。逐 seed 核對數字見 [`operating_points.csv`](../results/statistics/operating_points.csv)。
 
-`Sens@Spec95` 是 test ROC 曲線上的描述性指標，**不是** val 選定 τ 的實際 sensitivity。val 選定 τ 的 test specificity 為 39.7%，未達 95%。FP vs TN 特徵檢查、train/test KS 及 pooling 均屬探索性，不作確認性因果結論。H1 的「紋理勝過只用平均亮度」尚缺完全受控對照；H2 的 contrast normalization 未驗證；兩者均不能標為已證實。
+`Sens@Spec95` 是 test ROC 曲線上的描述性指標，**不是** val 選定 τ 的實際 sensitivity。val 選定 τ 的 test specificity 為 39.7%，未達 95%。FP vs TN 特徵檢查、train/test KS 及 pooling 均屬探索性，不作確認性因果結論。H1 的「紋理勝過只用平均亮度」尚缺完全受控對照；H2 的 contrast normalization 未驗證；兩個假設均尚未獲得完整驗證。
 
 ## 6. 分析限制與結果重現
 

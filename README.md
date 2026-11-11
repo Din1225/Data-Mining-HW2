@@ -13,7 +13,7 @@ HW2/
 │   ├── DataSplit_LeakagePrevention.md
 │   ├── TaskDefinition_Labels_ClassImbalance.md
 │   ├── Exploratory_Feature_Analysis.md
-│   ├── MainExperiments_Summary.md      # 主實驗總覽（給組員）
+│   ├── MainExperiments_Summary.md      # 主實驗流程、結果與限制
 │   └── Statistical_Error_Analysis.md   # 統計顯著性、案例查證與分析限制
 ├── results/
 │   ├── features/                       # 所有 split 的影像特徵快取（Tier 1 使用）
@@ -110,7 +110,7 @@ python src/export_latex.py
 
 ## 評估流程
 
-以下是組員原模型流程；分析重現只需上節指令。`results/evaluation/` 是原始 image-level bootstrap；`results/statistics/` 是 cluster bootstrap 補充。產生論文素材前先執行統計分析，匯出程式會用新 cluster gap CI／Holm p 更新主表與 ablation；主表個別方法的 CI 仍保留原 image-level 定義並註明。
+以下為模型實驗流程；統計核對使用上節指令。`results/evaluation/` 是原始 image-level bootstrap；`results/statistics/` 是 cluster bootstrap 補充。匯出表格前執行統計分析，匯出程式會用新 cluster gap CI／Holm p 更新主表與 ablation；主表個別方法的 CI 仍保留原 image-level 定義並註明。
 
 每個方法把 val/test 的 anomaly score（越高越異常）寫到 `results/methods/<method>/scores_seed<k>.csv`，判定規則為 $s(x) > \tau$。所有方法都以同一個 `evaluation.py` 評估：
 
@@ -148,6 +148,6 @@ python src/export_latex.py
 - `doc/DataSplit_LeakagePrevention.md`：資料來源、重新切分原因、固定切分方法與 leakage-prevention protocol。
 - `doc/TaskDefinition_Labels_ClassImbalance.md`：normal/anomaly 定義、樣本與標籤規格、feature dimension、class imbalance 及評估限制。
 - `doc/Exploratory_Feature_Analysis.md`：training-only distribution contrast、feature separability、feature association、冗餘檢查與後續實驗假設。
-- `doc/MainExperiments_Summary.md`：主實驗（Tier 1–3、ablation、錯誤分析、heatmap）的總覽、結果、評分表對照與待辦事項。
+- `doc/MainExperiments_Summary.md`：主實驗（Tier 1–3、ablation、錯誤分析、heatmap）的流程、結果與分析限制。
 - `doc/Statistical_Error_Analysis.md`：統計方法與結果、資料核對、錯誤案例、分析限制、貢獻與 AI 使用揭露。
 
