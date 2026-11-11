@@ -6,7 +6,7 @@
 python src/export_latex.py
 ```
 
-2026-11-11 更新：先執行 `python src/statistical_analysis.py`。`table_main.tex` 的方法自身 CI 仍為組員原始 2000 次 image-level bootstrap；方法間 gap 及 `table_ablation.tex` 改用 5000 次 paired cluster bootstrap／Holm。詳細方法、貢獻歸屬、案例查證與限制見 [Statistical_Error_Analysis.md](../doc/Statistical_Error_Analysis.md)。原 `results/evaluation/` 不覆寫。
+統計表格匯出前先執行 `python src/statistical_analysis.py`。`table_main.tex` 的方法自身 CI 仍為組員原始 2000 次 image-level bootstrap；方法間 gap 及 `table_ablation.tex` 改用 5000 次 paired cluster bootstrap／Holm。詳細方法、貢獻歸屬、案例查證與限制見 [Statistical_Error_Analysis.md](../doc/Statistical_Error_Analysis.md)。原 `results/evaluation/` 不覆寫。
 
 ## 在 Overleaf 使用
 
@@ -24,7 +24,7 @@ python src/export_latex.py
 ```
 
 3. 在正文需要的位置 `\input{generated/table_main.tex}`。所有表格都已加上 `\caption` 與 `\label`，可用 `Table~\ref{tab:main}` 引用。
-4. 表格以 `adjustbox` 的 `max width` 限制在欄寬內（只縮小不放大）。組員先前做過 A4 雙欄編譯檢查；新 caption 與最終 ACL 六頁版面仍需在整合後複核，不能沿用舊檢查當作新版已通過。
+4. 表格以 `adjustbox` 的 `max width` 限制在欄寬內（只縮小不放大）。組員先前做過 A4 雙欄編譯檢查；新 caption 與最終 ACL 六頁版面仍需在整合後複核。
 
 ## 各章節素材
 

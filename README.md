@@ -14,7 +14,7 @@ HW2/
 │   ├── TaskDefinition_Labels_ClassImbalance.md
 │   ├── Exploratory_Feature_Analysis.md
 │   ├── MainExperiments_Summary.md      # 主實驗總覽（給組員）
-│   └── Statistical_Error_Analysis.md   # Chao：統計、案例查證、限制與口試重點
+│   └── Statistical_Error_Analysis.md   # 統計顯著性、案例查證與分析限制
 ├── results/
 │   ├── features/                       # 所有 split 的影像特徵快取（Tier 1 使用）
 │   ├── methods/                        # 各方法的 val/test 分數檔，一個方法一個資料夾
@@ -68,7 +68,7 @@ source .venv-analysis/bin/activate
 python -m pip install -r requirements-analysis.txt
 ```
 
-本次在 macOS、Python 3.14 重現分析，沒有訓練模型。組員原主實驗的環境為 Python 3.11、PyTorch 2.14.1+cu126、torchvision 0.29.1+cu126、RTX 3090；原 `requirements.txt` 不含 PyTorch／torchvision。若要重跑 CUDA 訓練，需另外建立相容的 GPU 環境並裝這些依賴，不能把本機分析環境當成已驗證的訓練環境。
+統計分析環境為 macOS、Python 3.14，不執行模型訓練。組員原主實驗的環境為 Python 3.11、PyTorch 2.14.1+cu126、torchvision 0.29.1+cu126、RTX 3090；原 `requirements.txt` 不含 PyTorch／torchvision。若要重跑 CUDA 訓練，需另外建立相容的 GPU 環境並裝這些依賴；此分析環境不包含 CUDA 訓練依賴。
 
 ## 下載資料集與資料切分
 
@@ -86,7 +86,7 @@ python -m unittest discover -s tests -v
 python src/export_latex.py
 ```
 
-之後只需 `python src/statistical_analysis.py` 即可重建 `results/statistics/`；預設 bootstrap 5000、seed 42。這會使用既有分數，不呼叫模型訓練。原 `download_pneumonia.py` 仍保留供組員工作流程使用，但會取得 latest 並清理下載暫存；本次沒有執行它。
+之後只需 `python src/statistical_analysis.py` 即可重建 `results/statistics/`；預設 bootstrap 5000、seed 42。這會使用既有分數，不呼叫模型訓練。原 `download_pneumonia.py` 仍保留供組員工作流程使用，但會取得 latest 並清理下載暫存。
 
 
 ## 主要程式
@@ -110,7 +110,7 @@ python src/export_latex.py
 
 ## 評估流程
 
-以下是組員原模型流程；分析重現只需上節指令。`results/evaluation/` 是原始 image-level bootstrap；`results/statistics/` 是本次 cluster 補充。產生論文素材前先執行統計分析，匯出程式會用新 cluster gap CI／Holm p 更新主表與 ablation；主表個別方法的 CI 仍保留原 image-level 定義並註明。
+以下是組員原模型流程；分析重現只需上節指令。`results/evaluation/` 是原始 image-level bootstrap；`results/statistics/` 是 cluster bootstrap 補充。產生論文素材前先執行統計分析，匯出程式會用新 cluster gap CI／Holm p 更新主表與 ablation；主表個別方法的 CI 仍保留原 image-level 定義並註明。
 
 每個方法把 val/test 的 anomaly score（越高越異常）寫到 `results/methods/<method>/scores_seed<k>.csv`，判定規則為 $s(x) > \tau$。所有方法都以同一個 `evaluation.py` 評估：
 
@@ -149,5 +149,5 @@ python src/export_latex.py
 - `doc/TaskDefinition_Labels_ClassImbalance.md`：normal/anomaly 定義、樣本與標籤規格、feature dimension、class imbalance 及評估限制。
 - `doc/Exploratory_Feature_Analysis.md`：training-only distribution contrast、feature separability、feature association、冗餘檢查與後續實驗假設。
 - `doc/MainExperiments_Summary.md`：主實驗（Tier 1–3、ablation、錯誤分析、heatmap）的總覽、結果、評分表對照與待辦事項。
-- `doc/Statistical_Error_Analysis.md`：本次新增統計設計、已執行核對、錯誤案例、貢獻與 AI 使用揭露、spec 缺口，以及口試回答重點；整合 §7–§8 時優先核對這份及機器輸出。
+- `doc/Statistical_Error_Analysis.md`：統計方法與結果、資料核對、錯誤案例、分析限制、貢獻與 AI 使用揭露。
 
