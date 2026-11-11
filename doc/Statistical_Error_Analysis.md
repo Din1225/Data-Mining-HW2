@@ -83,11 +83,3 @@ python3.14 -m venv .venv-analysis
 ```
 
 資料須存在 `data/chest_xray/re-split/` 並包含 manifest。首次使用 Kaggle v2 archive 時，可加上 `--archive data/chest_xray/kaggle-v2.zip`，由分析程式沿用既有 splitter 建立資料切分。套件版本及輸入檔案 SHA-256 見 `results/statistics/verification.json`。
-
-## 7. Contributions 與 AI 使用
-
-- **Ding-Xiang Lin**：資料統計、切分、前處理與 feature analysis。
-- **Tien-Chia Chang**：主實驗、ablation、共用評估、初版 bootstrap／錯誤案例、heatmap 與論文素材。
-- **Chao Hsiao**：原始資料與 scores 核對、paired cluster bootstrap／Holm、既有案例重現與查證、統計結果與分析文件。
-
-既有主實驗文件記載 Claude Code 協助撰寫程式。補充分析使用 OpenAI Codex 協助方法草擬、程式與測試撰寫、執行核對及文字整理，包括 cluster bootstrap 設計；模型與原始 scores 沿用組員實驗。團隊對採用的方法與結果解讀負責。
