@@ -1,0 +1,6 @@
+# 統計核對與錯誤案例查證所需套件。
+numpy==2.5.4
+scipy==1.18.1
+scikit-learn==1.9.1
+Pillow==13.0.0
+matplotlib==3.11.2
