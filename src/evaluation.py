@@ -255,7 +255,7 @@ def stratified_bootstrap_indices(labels: np.ndarray, count: int, seed: int) -> n
     )
 
 
-# 每次 resample 對各 seed 計算指標後取 seed 平均，同時涵蓋 test 抽樣與 seed 的變異。
+# 每次 resample 對固定的各 seed 計算指標再平均；CI 只反映 test 抽樣，沒有重抽 seed。
 def bootstrap_ranking(method: Method, indices: np.ndarray) -> dict[str, np.ndarray]:
     samples = {metric: np.zeros(len(indices)) for metric in RANKING_METRICS}
     for run in method.runs:

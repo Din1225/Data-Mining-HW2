@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import shutil
@@ -144,6 +145,23 @@ class Results:
         self.reference = gap_rows[0]["reference"]
         self.info = json.loads((evaluation_dir / "method_info.json").read_text(encoding="utf-8"))
         self.config = json.loads((evaluation_dir / "evaluation_config.json").read_text(encoding="utf-8"))
+        statistics_dir = project_dir / "results/statistics"
+        self.cluster_config = None
+        if (statistics_dir / "paired_cluster_gaps.csv").exists():
+            self.cluster_config = json.loads((statistics_dir / "verification.json").read_text(encoding="utf-8"))
+            for relative, expected_hash in self.cluster_config["inputs_sha256"].items():
+                with (project_dir / relative).open("rb") as source:
+                    actual_hash = hashlib.file_digest(source, "sha256").hexdigest()
+                if actual_hash != expected_hash:
+                    raise ValueError(f"統計輸入已變更，請先重跑 statistical_analysis.py：{relative}")
+            for row in read_csv(statistics_dir / "paired_cluster_gaps.csv"):
+                if row["reference"] == self.reference:
+                    self.gaps[(row["method"], row["metric"])] = {**row, "p_value": row["p_holm"]}
+                elif row["method"] == self.reference:
+                    self.gaps[(row["reference"], row["metric"])] = {
+                        **row, "method": row["reference"], "reference": row["method"],
+                        "gap": -float(row["gap"]), "ci_low": -float(row["ci_high"]),
+                        "ci_high": -float(row["ci_low"]), "p_value": row["p_holm"]}
 
     def get(self, method: str, metric: str, strategy: str = "threshold_free") -> dict:
         return self.summary[(method, strategy, metric)]
@@ -184,14 +202,17 @@ def table_main(results: Results, strategy: str) -> str:
 
     t1 = results.gaps[("tier1_edge_3sigma", "roc_auc")]
     t3 = results.gaps[("tier3_densenet121", "roc_auc")]
+    paired_label = (f"Paired cluster bootstrap ({results.cluster_config['bootstrap']} resamples; "
+                    "filename proxies union exact duplicates; Holm-adjusted approximate $p$ over two ROC-AUC comparisons)"
+                    if results.cluster_config else "Paired image-level bootstrap")
     caption = (
         "Main results on the frozen official test set (234 NORMAL / 390 PNEUMONIA). All methods share one split; "
         "$\\tau$ is chosen on validation only and an alert is raised when $s(x) > \\tau$. Mean{\\scriptsize$\\pm$std} "
         f"over seeds where a method has more than one; 95\\% CI by stratified bootstrap ({results.config['bootstrap']} "
-        f"resamples). Paired bootstrap: Tier~2 vs.\\ Tier~1 (edge $3\\sigma$) $\\Delta$ROC-AUC "
+        f"resamples; image-level, conditional on saved seeds). {paired_label}: Tier~2 vs.\\ Tier~1 (edge $3\\sigma$) $\\Delta$ROC-AUC "
         f"$= {-float(t1['gap']):+.3f}$ [{-float(t1['ci_high']):.3f}, {-float(t1['ci_low']):.3f}], "
-        f"$p {p_text(float(t1['p_value'])).replace('$<$', '<')}$; Tier~3 vs.\\ Tier~2 $\\Delta = {float(t3['gap']):+.3f}$ "
-        f"[{float(t3['ci_low']):.3f}, {float(t3['ci_high']):.3f}], $p {p_text(float(t3['p_value'])).replace('$<$', '<')}$. "
+        f"$p {'<.001' if float(t1['p_value']) < .001 else '= ' + number(float(t1['p_value']))}$; Tier~3 vs.\\ Tier~2 $\\Delta = {float(t3['gap']):+.3f}$ "
+        f"[{float(t3['ci_low']):.3f}, {float(t3['ci_high']):.3f}], $p {'<.001' if float(t3['p_value']) < .001 else '= ' + number(float(t3['p_value']))}$. "
         "Latency is end-to-end per image (JPEG decode, resize, scoring); Tier~1 features run on CPU, "
         "Tiers~2--3 on one RTX~3090. Best value per column in bold."
     )
@@ -216,10 +237,13 @@ def table_ablation(results: Results) -> str:
     caption = (
         "Controlled ablations of the Tier~2 detector (test ROC-AUC). Full method: block3 features average-pooled over "
         "the whole $16{\\times}16$ map, L2 normalization, $k{=}2$, stretch resize, clean train-NORMAL bank. "
-        "``Pool'' rows restrict pooling to a central region of the feature map (an approximate lung-field crop, "
-        "not a segmentation); they were designed after the error analysis (Section~8) as a diagnostic, and the "
+        "``Pool'' rows restrict pooling to fixed geometric regions of the feature map (not lung segmentation); "
+        "they were designed after the error analysis (Section~8) as a diagnostic, and the "
         "reported method was not changed. Each row changes exactly one factor; $\\Delta$, CI and $p$ "
-        "from a paired bootstrap. Rows with 3 seeds vary the injected or sub-sampled images. "
+        + ("from paired cluster bootstrap, conditional on saved seeds (5000 resamples); marginal 95\\% CIs, "
+           "approximate $p$ with Holm correction across 18 exploratory ROC-AUC/AP comparisons. "
+           if results.cluster_config else "from a paired image-level bootstrap. ")
+        + "Rows with 3 seeds vary the injected or sub-sampled images. "
         "$^\\dagger$: $|\\Delta|$ exceeds the seed-to-seed std."
     )
     return wrap_table(body, caption, "tab:ablation", wide=False, columns="lcccc")

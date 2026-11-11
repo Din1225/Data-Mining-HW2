@@ -3,6 +3,8 @@
 > 給寫論文與做簡報的組員。整理主程式負責人（charlie-ww）到 2026-11-06 為止做完的事、結果、檔案位置，以及還需要大家處理的事項。
 > 程式與結果都在分支 `feat/tier2-tier3`（等 PR 合併到 `main`）。**寫論文時的細節（可以寫／不能寫的說法、§6 設定）請看 [paper/README.md](../paper/README.md)**，本文件只做總覽。
 
+> 2026-11-11 核對註：上述 PR 已合併為 `79861e5`。以下保留 Charlie 11-06 的工作紀錄；其中 p／CI 是原始 image-level bootstrap，部分因果及 heatmap 用語需收斂。**正式整合請用 [Statistical_Error_Analysis.md](Statistical_Error_Analysis.md) 與更新的 paper/README**：cluster/Holm 後 T2−T1 ROC-AUC p=.004、AP p=.200；center8 未檢出差異；不顯著不代表等效，模型差距不等於標籤的因果效果。原稿提到匿名 review 是 optional TA Judge 草稿，正式交件應為 preprint。不能把這份歷史總覽視為新的 spec 完成清單。
+
 ## 一句話結論
 
 只用正常影像訓練的 Tier 2（凍結 DenseNet121 特徵 + kNN）test ROC-AUC **0.877**，顯著優於簡單規則 Tier 1（0.813），但不如使用肺炎標籤的監督式 Tier 3（0.974）。主要失敗原因是 test 的正常影像拍攝條件與訓練資料不同，而且 heatmap 顯示模型依據的多半是擺位／取景，而非肺部病灶。

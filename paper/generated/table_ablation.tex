@@ -10,18 +10,18 @@ Variant (one change) & ROC-AUC & $\Delta$ & 95\% CI of $\Delta$ & $p$ \\
 \midrule
 Full method & 0.877 & --- & --- & --- \\
 \midrule
-Mahalanobis scorer & 0.864 & $-$.013 & {\scriptsize[$-$.028, .000]} & .056 \\
-Aspect-preserving crop & 0.887 & +.009 & {\scriptsize[$-$.012, +.031]} & .414 \\
-Pool w/o top 3 rows & 0.883 & +.005 & {\scriptsize[$-$.003, +.014]} & .191 \\
-Pool central $12{\times}12$ & 0.906 & +.029 & {\scriptsize[+.014, +.046]} & $<$.001 \\
-Pool central $8{\times}8$ & 0.899 & +.022 & {\scriptsize[+.001, +.043]} & .040 \\
-90\% of normal bank & 0.877{\scriptsize$\pm$.004} & $-$.001 & {\scriptsize[$-$.003, +.001]} & .332 \\
-1\% contamination & 0.860{\scriptsize$\pm$.009} & $-$.017$^\dagger$ & {\scriptsize[$-$.023, $-$.013]} & $<$.001 \\
-5\% contamination & 0.769{\scriptsize$\pm$.005} & $-$.108$^\dagger$ & {\scriptsize[$-$.128, $-$.089]} & $<$.001 \\
-10\% contamination & 0.714{\scriptsize$\pm$.023} & $-$.163$^\dagger$ & {\scriptsize[$-$.190, $-$.138]} & $<$.001 \\
+Mahalanobis scorer & 0.864 & $-$.013 & {\scriptsize[$-$.028, +.002]} & .785 \\
+Aspect-preserving crop & 0.887 & +.009 & {\scriptsize[$-$.014, +.034]} & 1.000 \\
+Pool w/o top 3 rows & 0.883 & +.005 & {\scriptsize[$-$.003, +.014]} & 1.000 \\
+Pool central $12{\times}12$ & 0.906 & +.029 & {\scriptsize[+.013, +.046]} & .010 \\
+Pool central $8{\times}8$ & 0.899 & +.022 & {\scriptsize[$-$.001, +.044]} & .548 \\
+90\% of normal bank & 0.877{\scriptsize$\pm$.004} & $-$.001 & {\scriptsize[$-$.003, +.001]} & 1.000 \\
+1\% contamination & 0.860{\scriptsize$\pm$.009} & $-$.017$^\dagger$ & {\scriptsize[$-$.023, $-$.012]} & .007 \\
+5\% contamination & 0.769{\scriptsize$\pm$.005} & $-$.108$^\dagger$ & {\scriptsize[$-$.130, $-$.089]} & .007 \\
+10\% contamination & 0.714{\scriptsize$\pm$.023} & $-$.163$^\dagger$ & {\scriptsize[$-$.192, $-$.136]} & .007 \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\caption{Controlled ablations of the Tier~2 detector (test ROC-AUC). Full method: block3 features average-pooled over the whole $16{\times}16$ map, L2 normalization, $k{=}2$, stretch resize, clean train-NORMAL bank. ``Pool'' rows restrict pooling to a central region of the feature map (an approximate lung-field crop, not a segmentation); they were designed after the error analysis (Section~8) as a diagnostic, and the reported method was not changed. Each row changes exactly one factor; $\Delta$, CI and $p$ from a paired bootstrap. Rows with 3 seeds vary the injected or sub-sampled images. $^\dagger$: $|\Delta|$ exceeds the seed-to-seed std.}
+\caption{Controlled ablations of the Tier~2 detector (test ROC-AUC). Full method: block3 features average-pooled over the whole $16{\times}16$ map, L2 normalization, $k{=}2$, stretch resize, clean train-NORMAL bank. ``Pool'' rows restrict pooling to fixed geometric regions of the feature map (not lung segmentation); they were designed after the error analysis (Section~8) as a diagnostic, and the reported method was not changed. Each row changes exactly one factor; $\Delta$, CI and $p$ from paired cluster bootstrap, conditional on saved seeds (5000 resamples); marginal 95\% CIs, approximate $p$ with Holm correction across 18 exploratory ROC-AUC/AP comparisons. Rows with 3 seeds vary the injected or sub-sampled images. $^\dagger$: $|\Delta|$ exceeds the seed-to-seed std.}
 \label{tab:ablation}
 \end{table}

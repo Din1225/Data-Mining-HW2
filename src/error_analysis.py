@@ -108,7 +108,7 @@ def select_cases(table: list[dict], count_worst: int, count_near: int) -> list[d
     return cases
 
 
-# FP 與 TN 都是 test NORMAL；若 FP 的拍攝特徵與 TN 不同，代表誤報來自拍攝條件而非病灶。
+# FP 與 TN 都是 test NORMAL；特徵差異只提供誤報與拍攝條件相關的探索性證據，不能判定原因。
 def compare_fp_tn(table: list[dict], scores_by_path: dict[str, float]) -> list[dict]:
     normals = [row for row in table if row["label"] == "NORMAL"]
     is_fp = np.asarray([row["outcome"] == "FP" for row in normals])
