@@ -71,7 +71,7 @@ python -m pip install -r requirements.txt
 
 ## 統計分析環境（venv）
 
-統計核對可獨立使用 Python 3.14 venv，不需要 Conda 或 CUDA：
+統計核對可獨立使用 Python 3.14 venv：
 
 ```bash
 python3.14 -m venv .venv-analysis
